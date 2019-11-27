@@ -73,6 +73,19 @@ class GTXBot(commands.AutoShardedBot):
 	async def on_message(self, message):
 		if self.is_ready():
 			await super().on_message(message)
+		"""
+		threads = {
+			647776725031190558: 'f',
+			647776760947015701: 'hmm',
+			648308440267227147: 'kek',
+			648415976127201290: 'hi'
+		}
+		if message.channel.id != any([647776725031190558, 647776760947015701, 648308440267227147, 648415976127201290]):
+			return
+		else:
+			if message.content.lower() != threads[message.channel.id]:
+				await message.delete()
+		"""
 
 	async def on_ready(self):
 		old_time = self.connect_time
@@ -92,6 +105,7 @@ class GTXBot(commands.AutoShardedBot):
 				await self.change_presence(activity=presences.current)
 				presences.next()
 				await asyncio.sleep(20)
+
 
 def read_config():
 	conf_template = {

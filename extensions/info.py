@@ -4,6 +4,7 @@ import asyncio
 import datetime
 import aiohttp
 
+
 class Tools(commands.Cog):
     def __init__(self, bot):
         super().__init__()
@@ -78,9 +79,16 @@ class Tools(commands.Cog):
             if channel_id != ctx.channel.id:
                 time_str = self.bot.strfdelta((last - now - datetime.timedelta(seconds=25)), ' {hours}h {minutes}m {seconds}s').replace(' 0h', '').replace(' 0m', '').replace(' 0s', '').lstrip()
                 desc += f'**<#{channel_id}> was active ``{time_str}`` ago.**\n\n'
-
         embed.description = desc
         await msg.edit(content=f'', embed=embed)
+
+    @commands.command(brief='Reloads a cog (for developer use only)', usage='[cog]')
+    async def reload(self, ctx, cog):
+        if ctx.message.author.id not in [308034225137778698, 304219290649886720]:
+            await ctx.send(f'Sorry, {ctx.message.author.mention}, this command is for developer use only.')
+        else:
+            self.bot.reload_extension(f'extensions.{cog}')
+            await ctx.send(f":white_check_mark: **Extension `{cog}` successfully reloaded**")
 
 
 def setup(bot):
