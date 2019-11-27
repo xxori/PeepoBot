@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 import datetime
-
+import aiohttp
 
 class Tools(commands.Cog):
     def __init__(self, bot):
@@ -53,8 +53,10 @@ class Tools(commands.Cog):
 
     @commands.command(brief='Finds bot latency', description='Displays the bots latency in milleseconds.')
     async def ping(self, ctx):
-        embed = discord.Embed(color=0xff0000 if self.bot.latency > 400 else 0x00ff00)
-        embed.add_field(name=':hourglass:' + str(round(self.bot.latency * 1000, 2)) + 'ms', value='epstein didnt kill himself')
+        embed = discord.Embed(color=0xff0000 if self.bot.latency * 1000 > 400 else 0x00ff00)
+        async with aiohttp.ClientSession().get(url='https://uselessfacts.jsph.pl/random.json?language=en') as response:
+            fact = await response.json()
+        embed.add_field(name=':hourglass:' + str(round(self.bot.latency * 1000, 2)) + 'ms', value=fact['text'])
         await ctx.send(embed=embed)
 
     @commands.command(brief='Find an active channel', description='List all channels and sort by most recent activity.')

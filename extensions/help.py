@@ -56,7 +56,6 @@ class HelpCommand(commands.HelpCommand):
         await self.context.author.send(text)
         await self.get_destination().send(f"{self.context.author.mention} :point_right: **Check your DM's!**")
 
-
     async def command_not_found(self, string):
         await self.get_destination().send(f"``{string}`` isn't a command, double check your spelling.")
 
