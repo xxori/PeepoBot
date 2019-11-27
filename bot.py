@@ -1,19 +1,21 @@
 import discord
 from discord.ext import commands
+import traceback
 import datetime
 import asyncio
 import logging
+import random
+import utils
 import json
 import time
 import sys
 import os
-import traceback
-import random
 
 
-class SystemDBot(commands.AutoShardedBot):
+
+class GTXBot(commands.AutoShardedBot):
 	def __init__(self, logger, config):
-		super(SystemDBot, self).__init__(command_prefix=commands.when_mentioned_or('sudo '))
+		super(GTXBot, self).__init__(command_prefix=commands.when_mentioned_or('$'))
 
 		self.logger = logger
 		self.config = config
@@ -21,6 +23,7 @@ class SystemDBot(commands.AutoShardedBot):
 		self.version = '1.0.0'
 		self.run_time = None
 		self.connect_time = None
+		self.presences = []
 
 		self.module_directories = ['extensions']
 
@@ -49,12 +52,18 @@ class SystemDBot(commands.AutoShardedBot):
 	def run(self):
 		self.load_cogs()
 		self.run_time = datetime.datetime.utcnow()
+		self.logger.info('Loading presences.')
+
+		with open('presences.txt', 'r+') as f:
+			self.presences = f.read().splitlines()
+		self.logger.info(f'Loaded ({len(self.presences)}) presences.')
+
 		#self.logger.info('Initializing database.')
 		#self.loop.run_until_complete(dbcontrol.initialize_tables(bot))
 		self.logger.info('Pre-start checks cleared, start login.')
 
 		try:
-			super(SystemDBot, self).run(self.config['token'])
+			super(GTXBot, self).run(self.config['token'])
 		except discord.LoginFailure as e:
 			self.logger.critical(f'Login Failure - {e}')
 		self.logger.info('Bot has shut down successfully.')
@@ -70,9 +79,19 @@ class SystemDBot(commands.AutoShardedBot):
 		self.connect_time = datetime.datetime.utcnow()
 		self.logger.info(f'Connection time reset. ({old_time or "n/a"} -> {self.connect_time})')
 		self.logger.info(f'Client ready: {self.user} ({self.user.id})')
-		await self.change_presence(activity=discord.Game(random.choice(self.config['presence_cycle'])))
-		self.logger.info(f'Changed presence.')
+		self.loop.create_task(self.presence_changer())
+		self.logger.info(f'Started presence loop.')
 
+	async def presence_changer(self):
+		possible = [discord.Game(name=i) for i in self.presences]
+		presences = utils.Cycle(possible)
+		presences.index = random.randint(0, len(possible)-1)
+
+		while True:
+			if self.is_ready():
+				await self.change_presence(activity=presences.current)
+				presences.next()
+				await asyncio.sleep(20)
 
 def read_config():
 	conf_template = {
@@ -80,8 +99,7 @@ def read_config():
 		'logfiles': {
 			'enabled': True,
 			'overwrite': False
-		},
-		'presence_cycle': ['GTX+ MasterRace', 'sudo help', 'also see rtx+']
+		}
 	}
 
 	if not os.path.isfile('config.json'):
@@ -92,6 +110,8 @@ def read_config():
 		with open('config.json', 'r') as f:
 			data = json.load(f)
 		return data
+
+
 
 
 if __name__ == '__main__':
@@ -125,7 +145,7 @@ if __name__ == '__main__':
 		logger.addHandler(filehandler)
 
 	time.sleep(0.1)
-	bot = SystemDBot(logger=logger, config=config)
+	bot = GTXBot(logger=logger, config=config)
 
 	bot.run()
 

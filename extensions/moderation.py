@@ -8,40 +8,36 @@ class Moderation(commands.Cog):
 
     @property
     def description(self):
-        return 'Commmands for admins to use to moderate server'
+        return 'Moderation-related commands. Admin-only.'
 
-    @commands.command(brief='Permanently bans a user')
+    @commands.has_permissions(ban_members=True)
+    @commands.bot_has_permissions(ban_members=True)
+    @commands.command(brief='Permanently ban a user from the server', usage='<user> [reason]')
     async def ban(self, ctx, target: discord.Member, *, reason=None):
         try:
-            if dict(iter(ctx.message.author.permissions_in(ctx.message.channel)))['ban_members']:
-                await discord.Guild.ban(ctx.guild, target, reason=f'With reason {reason}')
-                embed = discord.Embed(color=0xFF0000, description=reason if reason else None)
-                embed.set_author(name=f'User {target.display_name} successfully banned')
-                embed.set_thumbnail(url=target.avatar_url)
-                await ctx.send(embed=embed)
-            else:
-                await ctx.send(f"Sorry, {ctx.message.author.mention}, you don't have permissions to ban someone")
+            await target.ban(reason=f'{ctx.author}: {reason or "unspecified reason"}')
+        except discord.Forbidden:
+            await ctx.send(f':x: **I am not authorized to ban ``{target}``.**')
+        else:
+            await ctx.send(f':thumbsup: **Banned ``{target}``{f" for {reason}" if reason is not None else ""}**')
 
-        # This is shit, there is probably a better way or using an actual error handler
-        except discord.errors.Forbidden:
-            await ctx.send(f"{ctx.message.author.mention}, you can't ban an administrator")
-
-    @commands.command(brief='Kicks a user from the server')
+    @commands.has_permissions(kick_members=True)
+    @commands.bot_has_permissions(kick_members=True)
+    @commands.command(brief='Kicks a user from the server', usage='<user> [reason]')
     async def kick(self, ctx, target: discord.Member, *, reason=None):
         try:
-            if dict(iter(ctx.message.author.permissions_in(ctx.message.channel)))['kick_members']:
-                await discord.Guild.kick(ctx.guild, target, reason=f'With reason {reason}')
-                embed = discord.Embed(color=0xFF0000, description=reason if reason else None)
-                embed.set_author(name=f'User {target.display_name} successfully kicked')
-                embed.set_thumbnail(url=target.avatar_url)
-                await ctx.send(embed=embed)
+            await target.kick(reason=f'{ctx.author}: {reason or "unspecified reason"}')
+        except discord.Forbidden:
+            await ctx.send(f':x: **I am not authorized to kick ``{target}``.**')
+        else:
+            await ctx.send(f':thumbsup: **Kicked ``{target}``{f" for {reason}" if reason is not None else ""}**')
 
-            else:
-                await ctx.send(f"{ctx.message.author.mention}")
-
-        # Trash
-        except discord.errors.Forbidden:
-            await ctx.send(f"{ctx.message.author.mention}, you can't kick an administrator")
+    @commands.has_permissions(manage_messages=True)
+    @commands.bot_has_permissions(manage_messages=True)
+    @commands.command(brief='Deletes messages from the channel in bulk.', usage='[amount]')
+    async def purge(self, ctx, amount=50):
+        purged = len(await ctx.channel.purge(limit=amount))
+        await ctx.send(f':thumbsup: **Purged {purged} messages from <#{ctx.channel.id}>**', delete_after=2)
 
 def setup(bot):
     bot.add_cog(Moderation(bot))

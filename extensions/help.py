@@ -17,6 +17,9 @@ class HelpCommand(commands.HelpCommand):
     async def send_bot_help(self, mapping):
         text = ''
         for cog, cmds in mapping.items():
+            if hasattr(cog, 'hidden'):
+                if cog.hidden: continue
+
             if len(cmds) > 0:
                 if cog is not None:
                     cname = cog.qualified_name
@@ -57,7 +60,7 @@ class HelpCommand(commands.HelpCommand):
         await self.get_destination().send(f"{self.context.author.mention} :point_right: **Check your DM's!**")
 
     async def command_not_found(self, string):
-        await self.get_destination().send(f"``{string}`` isn't a command, double check your spelling.")
+        await self.get_destination().send(f":x: ``{string}`` isn't a command, check your spelling.")
 
 
 def setup(bot):
