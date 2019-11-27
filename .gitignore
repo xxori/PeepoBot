@@ -122,8 +122,14 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# PyCharm
-.idea
+# Bot Config File
+config.json
+
+# Pycharm thing
+.idea/
 
 # Data Storage
-/data
+data/
+
+# Logging
+logs/

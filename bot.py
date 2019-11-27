@@ -7,6 +7,9 @@ import json
 import time
 import sys
 import os
+import traceback
+import random
+
 
 class SystemDBot(commands.AutoShardedBot):
 	def __init__(self, logger, config):
@@ -67,9 +70,8 @@ class SystemDBot(commands.AutoShardedBot):
 		self.connect_time = datetime.datetime.utcnow()
 		self.logger.info(f'Connection time reset. ({old_time or "n/a"} -> {self.connect_time})')
 		self.logger.info(f'Client ready: {self.user} ({self.user.id})')
-		#await self.change_presence(activity=discord.Game(self.config['presence']))
+		await self.change_presence(activity=discord.Game(random.choice(self.config['presence_cycle'])))
 		self.logger.info(f'Changed presence.')
-
 
 
 def read_config():
@@ -79,7 +81,7 @@ def read_config():
 			'enabled': True,
 			'overwrite': False
 		},
-		'presence_cycle': ['starting services', 'sudo help', 'also see systemctl']
+		'presence_cycle': ['GTX+ MasterRace', 'sudo help', 'also see rtx+']
 	}
 
 	if not os.path.isfile('config.json'):
@@ -90,7 +92,6 @@ def read_config():
 		with open('config.json', 'r') as f:
 			data = json.load(f)
 		return data
-
 
 
 if __name__ == '__main__':

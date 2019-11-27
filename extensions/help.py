@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 
+
 class HelpCommand(commands.HelpCommand):
     def __init__(self):
         super().__init__()
@@ -54,7 +55,6 @@ class HelpCommand(commands.HelpCommand):
         text = f'```asciidoc\n{cmd_info}\n* {cmd_desc}```'
         await self.context.author.send(text)
         await self.get_destination().send(f"{self.context.author.mention} :point_right: **Check your DM's!**")
-
 
     async def command_not_found(self, string):
         await self.get_destination().send(f"``{string}`` isn't a command, double check your spelling.")

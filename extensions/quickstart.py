@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 
+
 class Quickstart(commands.Cog):
     def __init__(self, bot):
         super().__init__()
@@ -24,6 +25,7 @@ class Quickstart(commands.Cog):
                 '''
 
             await invite_user.send(invite_msg)
+
 
 def setup(bot):
     bot.add_cog(Quickstart(bot))
