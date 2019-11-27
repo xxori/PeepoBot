@@ -124,3 +124,6 @@ dmypy.json
 
 # Bot Config File
 config.json
+
+#Pycharm thing
+.idea/
