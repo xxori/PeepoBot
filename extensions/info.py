@@ -3,6 +3,7 @@ from discord.ext import commands
 import asyncio
 import datetime
 
+
 class Tools(commands.Cog):
     def __init__(self, bot):
         super().__init__()
@@ -10,7 +11,7 @@ class Tools(commands.Cog):
 
     @property
     def description(self):
-        return 'meme'
+        return 'Useful commands to provide information'
 
     @commands.command(brief='Get information about the current guild.', description='Shows useful information like membercount, rolecount and creation date')
     async def ginfo(self, ctx):
@@ -26,10 +27,34 @@ class Tools(commands.Cog):
 
         embed.add_field(name='Members', value=f'{ctx.guild.member_count} total, {humancount} humans, {botcount} bots', inline=False)
         embed.add_field(name='Channels', value=f'{len(ctx.guild.text_channels)} text, {len(ctx.guild.voice_channels)} voice', inline=False)
-        embed.add_field(name='Roles', value=len(ctx.guild.roles), inline=False)
+        embed.add_field(name='Roles', value=str(len(ctx.guild.roles)), inline=False)
         embed.add_field(name='Region', value=str(ctx.guild.region).capitalize(), inline=False)
 
         embed.set_thumbnail(url=ctx.guild.icon_url)
+        await ctx.send(embed=embed)
+
+    @commands.command(brief='Get information about your Discord account.', description='Shows information about ')
+    async def uinfo(self, ctx, user: discord.Member = None):
+        if not user:
+            user = ctx.message.author
+        embed = discord.Embed(color=user.color)
+        embed.set_author(name=f'User Info: {user.name}')
+        embed.add_field(name='ID', value=user.id, inline=False)
+        embed.add_field(name='Highest role', value=user.top_role, inline=False)
+        embed.add_field(name='Joined Server', value=user.joined_at.strftime('%A %d %B %Y at %I:%M %p'), inline=False)
+        embed.add_field(name='Account Created', value=user.created_at.strftime('%A %d %B %Y at %I:%M %p'), inline=False)
+        embed.set_thumbnail(url=user.avatar_url)
+        embed.add_field(name='Nickname: ', value=user.nick, inline=False)
+        if user.activity:
+            embed.add_field(name='Current Activity: ', value=user.activity.name, inline=False)
+        else:
+            embed.add_field(name='Current Activity: ', value=user.activity, inline=False)
+        await ctx.send(embed=embed)
+
+    @commands.command(brief='Finds bot latency', description='Displays the bots latency in milleseconds.')
+    async def ping(self, ctx):
+        embed = discord.Embed(color=0xff0000 if self.bot.latency > 400 else 0x00ff00)
+        embed.add_field(name=':hourglass:' + str(round(self.bot.latency * 1000, 2)) + 'ms', value='epstein didnt kill himself')
         await ctx.send(embed=embed)
 
     @commands.command(brief='Find an active channel', description='List all channels and sort by most recent activity.')
@@ -54,8 +79,6 @@ class Tools(commands.Cog):
 
         embed.description = desc
         await msg.edit(content=f'', embed=embed)
-
-
 
 
 def setup(bot):
