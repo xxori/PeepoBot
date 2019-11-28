@@ -57,12 +57,16 @@ class Tools(commands.Cog):
     async def ping(self, ctx):
         embed = discord.Embed(color=0xff0000 if self.bot.latency * 1000 > 400 else 0x00ff00)
         if random.randint(1,2) == 1:
-            async with aiohttp.ClientSession().get(url='https://uselessfacts.jsph.pl/random.json?language=en') as response:
+            async with aiohttp.ClientSession() as session:
+                response = await session.get(url='https://uselessfacts.jsph.pl/random.json?language=en')
                 fact = await response.json()
+                await session.close()
             value = fact['text']
         else:
-            async with aiohttp.ClientSession().get(url='https://sv443.net/jokeapi/category/Any?blacklistFlags=nsfw') as response:
+            async with aiohttp.ClientSession() as session:
+                response = await session.get(url='https://sv443.net/jokeapi/category/Any?blacklistFlags=nsfw')
                 data = await response.json()
+                await session.close()
             if data['type'] == 'twopart':
                 value = data['setup'] + '\n' + data['delivery']
             else:

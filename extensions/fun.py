@@ -26,10 +26,10 @@ class Fun(commands.Cog):
             embed.add_field(name='Examples: ', value=data['list'][0]['example'], inline=False)
             await ctx.send(embed=embed)
 
-    @commands.command(brief='Shows posts from any subreddit', usage='[subreddit]')
-    async def meme(self, ctx, subreddit='dankmemes'):
-        url = 'https://meme-api.herokuapp.com/gimme/' + subreddit
-        async with aiohttp.ClientSession().get(url=url) as response:
+    @commands.command(brief='Shows posts from the dankmemes subreddit')
+    async def meme(self, ctx):
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(url='https://meme-api.herokuapp.com/gimme/dankmemes')
             data = await response.json()
         embed = discord.Embed(title=data['title'])
         embed.set_image(url=data['url'])
