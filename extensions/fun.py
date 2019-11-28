@@ -2,7 +2,6 @@ import aiohttp
 import discord
 from discord.ext import commands
 
-
 class Fun(commands.Cog):
 
     def __init__(self, bot):
@@ -26,6 +25,15 @@ class Fun(commands.Cog):
             embed.add_field(name='Top Definitions: ', value=data['list'][0]['definition'], inline=False)
             embed.add_field(name='Examples: ', value=data['list'][0]['example'], inline=False)
             await ctx.send(embed=embed)
+
+    @commands.command(brief='Shows posts from any subreddit', usage='[subreddit]')
+    async def meme(self, ctx, subreddit='dankmemes'):
+        url = 'https://meme-api.herokuapp.com/gimme/' + subreddit
+        async with aiohttp.ClientSession().get(url=url) as response:
+            data = await response.json()
+        embed = discord.Embed(title=data['title'])
+        embed.set_image(url=data['url'])
+        await ctx.send(embed=embed)
 
 
 def setup(bot):

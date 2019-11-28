@@ -3,6 +3,7 @@ from discord.ext import commands
 import asyncio
 import datetime
 import aiohttp
+import random
 
 
 class Tools(commands.Cog):
@@ -55,9 +56,18 @@ class Tools(commands.Cog):
     @commands.command(brief='Finds bot latency', description='Displays the bots latency in milleseconds.')
     async def ping(self, ctx):
         embed = discord.Embed(color=0xff0000 if self.bot.latency * 1000 > 400 else 0x00ff00)
-        async with aiohttp.ClientSession().get(url='https://uselessfacts.jsph.pl/random.json?language=en') as response:
-            fact = await response.json()
-        embed.add_field(name=':hourglass:' + str(round(self.bot.latency * 1000, 2)) + 'ms', value=fact['text'])
+        if random.randint(1,2) == 1:
+            async with aiohttp.ClientSession().get(url='https://uselessfacts.jsph.pl/random.json?language=en') as response:
+                fact = await response.json()
+            value = fact['text']
+        else:
+            async with aiohttp.ClientSession().get(url='https://sv443.net/jokeapi/category/Any?blacklistFlags=nsfw') as response:
+                data = await response.json()
+            if data['type'] == 'twopart':
+                value = data['setup'] + '\n' + data['delivery']
+            else:
+                value = data['joke']
+        embed.add_field(name=':hourglass:' + str(round(self.bot.latency * 1000, 2)) + 'ms', value=value)
         await ctx.send(embed=embed)
 
     @commands.command(brief='Find an active channel', description='List all channels and sort by most recent activity.')

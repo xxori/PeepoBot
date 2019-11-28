@@ -39,5 +39,32 @@ class Moderation(commands.Cog):
         purged = len(await ctx.channel.purge(limit=amount))
         await ctx.send(f':thumbsup: **Purged {purged} messages from <#{ctx.channel.id}>**', delete_after=2)
 
+    @commands.bot_has_permissions(manage_roles=True)
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(brief='Mutes a server member', usage='[user] <reason>')
+    async def mute(self, ctx, target: discord.Member, *, reason=None):
+        if 'administrator' in dict(iter(target.guild_permissions)):
+            await ctx.send(":octagonal_sign: **You can't mute an administrator**")
+        else:
+            muted = discord.utils.get(ctx.guild.roles, name='Muted')
+            await target.add_roles(muted, reason=reason)
+            embed = discord.Embed(description=f'By {ctx.author.mention} \n With reason {reason}' if reason else f'By {ctx.author.mention}', color=target.color)
+            embed.set_author(name=f'User {target.display_name} Muted')
+            embed.set_thumbnail(url=target.avatar_url)
+            await ctx.send(embed=embed)
+
+    @commands.bot_has_permissions(manage_roles=True)
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(brief='Unmutes a server member', usage='[user]')
+    async def unmute(self, ctx, target: discord.Member):
+        muted = discord.utils.get(ctx.guild.roles, name='Muted')
+        if muted in target.roles:
+            await target.remove_roles(muted)
+            embed = discord.Embed(description=f'By {ctx.author.mention}', color=target.color)
+            embed.set_thumbnail(url=target.avatar_url)
+            embed.set_author(name=f'User {target.display_name} Unmuted')
+            await ctx.send(embed=embed)
+
+
 def setup(bot):
     bot.add_cog(Moderation(bot))
