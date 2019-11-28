@@ -43,7 +43,7 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     @commands.command(brief='Mutes a server member', usage='[user] <reason>')
     async def mute(self, ctx, target: discord.Member, *, reason=None):
-        if 'administrator' in dict(iter(target.guild_permissions)):
+        if dict(iter(target.guild_permissions))['administrator']:
             await ctx.send(":octagonal_sign: **You can't mute an administrator**")
         else:
             muted = discord.utils.get(ctx.guild.roles, name='Muted')
