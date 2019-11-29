@@ -1,3 +1,7 @@
+import discord
+from discord.ext import commands
+import aiohttp
+
 class Cycle:
     def __init__(self, elements):
         self.elements = elements
@@ -43,3 +47,7 @@ async def is_developer(ctx):
         await ctx.send(f':x: **You need to be a bot developer to run ``{ctx.command.name}``.**')
         return False
     return True
+
+class HierarchyPermissionError(commands.CommandError):
+    def __init__(self, ctx, target):
+        super().__init__('', [ctx, target])

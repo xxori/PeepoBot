@@ -14,15 +14,39 @@ class Moderation(commands.Cog):
     @commands.bot_has_permissions(ban_members=True)
     @commands.command(brief='Permanently ban a user from the server', usage='<user> [reason]')
     async def ban(self, ctx, target: discord.Member, *, reason=None):
-        await target.ban(reason=f'{ctx.author}: {reason or "unspecified reason"}')
-        await ctx.send(f':thumbsup: **Banned ``{target}``{f" for {reason}" if reason is not None else ""}**')
+        if ctx.guild.owner_id == target.id:
+            await ctx.send(f':x: **You cannot kick ``{target}`` because they are the server owner.**')
+            return
+
+        elif (target.top_role >= ctx.message.author.top_role) and ctx.guild.owner_id != ctx.message.author.id:
+            await ctx.send(f':x: **You are not authorised to ban ``{target}``.**')
+            return
+
+        try:
+            await target.ban(reason=f'{ctx.author}: {reason or "unspecified reason"}')
+        except discord.Forbidden:
+            raise utils.HierarchyPermissionError(ctx, target)
+        else:
+            await ctx.send(f':thumbsup: **Banned ``{target}``{f" for {reason}" if reason is not None else ""}**')
 
     @commands.has_permissions(kick_members=True)
     @commands.bot_has_permissions(kick_members=True)
     @commands.command(brief='Kicks a user from the server', usage='<user> [reason]')
     async def kick(self, ctx, target: discord.Member, *, reason=None):
-        await target.kick(reason=f'{ctx.author}: {reason or "unspecified reason"}')
-        await ctx.send(f':thumbsup: **Kicked ``{target}``{f" for {reason}" if reason is not None else ""}**')
+        if ctx.guild.owner_id == target.id:
+            await ctx.send(f':x: **You cannot kick ``{target}`` because they are the server owner.**')
+            return
+
+        elif (target.top_role >= ctx.message.author.top_role) and ctx.guild.owner_id != ctx.message.author.id:
+            await ctx.send(f':x: **You are not authorised to kick ``{target}``.**')
+            return
+
+        try:
+            await target.kick(reason=f'{ctx.author}: {reason or "unspecified reason"}')
+        except discord.Forbidden:
+            raise utils.HierarchyPermissionError(ctx, target)
+        else:
+            await ctx.send(f':thumbsup: **Kicked ``{target}``{f" for {reason}" if reason is not None else ""}**')
 
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True)
@@ -39,12 +63,22 @@ class Moderation(commands.Cog):
         if muted is None:
             await ctx.send(':x: **A role called ``Muted`` is required for this command to run. Please create it before proceeding.**')
             return
+
         elif muted > ctx.guild.me.top_role:
             await ctx.send(':x: **I am not allowed to assign the ``Muted`` role. Please lower it below mine.**')
             return
 
-        if target.top_role > muted:
+        elif ctx.guild.owner_id == target.id:
+            await ctx.send(f':x: **You cannot mute ``{target}`` because they are the server owner.**')
+            return
+
+        elif (target.top_role >= ctx.message.author.top_role) and ctx.guild.owner_id != ctx.message.author.id:
+            await ctx.send(f':x: **You are not authorised to mute ``{target}``.**')
+            return
+
+        elif target.top_role > muted:
             await ctx.send(f':x: **``{target}`` has the role ``{target.top_role.name}`` which overrides permissions of the ``Muted`` role.**')
+
         else:
             await target.add_roles(muted, reason=f'{ctx.author}: {reason or "unspecified reason"}')
             await ctx.send(f':thumbsup: **Muted ``{target}``{f" because {reason}" if reason is not None else ""}**')

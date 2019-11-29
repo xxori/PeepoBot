@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import asyncio
 import traceback
-
+import utils
 class ErrorHandler(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -12,7 +12,10 @@ class ErrorHandler(commands.Cog):
         if hasattr(ctx.command, "on_error"):
             return
 
-        elif isinstance(e, commands.MissingRequiredArgument):
+        if isinstance(e, commands.CommandInvokeError):
+            e = e.original
+
+        if isinstance(e, commands.MissingRequiredArgument):
             await ctx.send(f':x: **``{ctx.command.name}`` requires the ``{e.param}`` argument!**')
 
         elif isinstance(e, commands.MissingPermissions):
@@ -29,12 +32,17 @@ class ErrorHandler(commands.Cog):
         elif isinstance(e, commands.BadArgument):
             await ctx.send(f':x: **{e.args[0]}**')
 
+        elif isinstance(e, utils.HierarchyPermissionError):
+            command = e.args[1][0].command
+            target = e.args[1][1]
+            await ctx.send(f':x: **I am not authorized to {command.name} ``{target}``.**')
+
         elif isinstance(e, commands.CheckFailure):
             # checks should handle their own error messages
             pass
 
         elif isinstance(e, discord.Forbidden):
-            await ctx.send(f':x: **I am not authorized to {command.name} ``{target}``.**')
+            await ctx.send(f':x: **I am not authorized to do that.**')
 
         elif isinstance(e, commands.CommandNotFound):
             await ctx.message.add_reaction("🤔")
