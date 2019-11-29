@@ -30,7 +30,8 @@ class ErrorHandler(commands.Cog):
             await ctx.send(f':x: **{e.args[0]}**')
 
         elif isinstance(e, commands.CheckFailure):
-            await ctx.send(f':x: **You do not meet the execution requirements for ``{ctx.command.name}``**')
+            # checks should handle their own error messages
+            pass
 
         elif isinstance(e, discord.Forbidden):
             await ctx.send(f':x: **I am not authorized to {command.name} ``{target}``.**')

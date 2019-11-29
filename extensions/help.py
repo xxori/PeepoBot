@@ -17,9 +17,6 @@ class HelpCommand(commands.HelpCommand):
     async def send_bot_help(self, mapping):
         text = ''
         for cog, cmds in mapping.items():
-            if hasattr(cog, 'hidden'):
-                if cog.hidden: continue
-
             if len(cmds) > 0:
                 if cog is not None:
                     cname = cog.qualified_name
@@ -47,8 +44,11 @@ class HelpCommand(commands.HelpCommand):
         text += '\n'
 
         await self.get_destination().send(f"{self.context.author.mention} :point_right: **Check your DM's!**")
-        for chunk in self.divide(text.splitlines(), 32):
-            await self.context.author.send('**``Bot Command Help``**\n```asciidoc\n'+'\n'.join(chunk).strip('```') + '```')
+        for idx, chunk in enumerate(self.divide(text.splitlines(), 64)):
+            doc = '\n```asciidoc\n'+'\n'.join(chunk).strip('```') + '```'
+            if idx == 0:
+                doc = '``Bot Commands``' + doc
+            await self.context.author.send(doc)
 
     async def send_command_help(self, cmd):
         cmd_name = "|".join(cmd.aliases) if len(cmd.aliases) else cmd.name

@@ -34,3 +34,9 @@ def format_thousands(num):
         return "{}k".format(num[:3])
     else:
         return num
+
+async def is_developer(ctx):
+    if ctx.message.author.id not in [308034225137778698, 304219290649886720]:
+        await ctx.send(f':x: **You need to be a bot developer to run ``{ctx.command.name}``.**')
+        return False
+    return True

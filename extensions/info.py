@@ -6,7 +6,7 @@ import aiohttp
 import random
 
 
-class Tools(commands.Cog):
+class Utility(commands.Cog):
     def __init__(self, bot):
         super().__init__()
         self.bot = bot
@@ -96,22 +96,6 @@ class Tools(commands.Cog):
         embed.description = desc
         await msg.edit(content=f'', embed=embed)
 
-    @commands.command(brief='Reloads a cog (for developer use only)', usage='[cog]')
-    async def reload(self, ctx, cog):
-        if ctx.message.author.id not in [308034225137778698, 304219290649886720]:
-            await ctx.send(f'Sorry, {ctx.message.author.mention}, this command is for developer use only.')
-        else:
-            self.bot.reload_extension(f'extensions.{cog}')
-            await ctx.send(f":white_check_mark: **Extension `{cog}` successfully reloaded**")
-
-    @commands.command(brief='Die bitch')
-    async def die(self, ctx):
-        if ctx.message.author.id not in [308034225137778698, 304219290649886720]:
-            await ctx.send(f'Sorry, {ctx.message.author.mention}, this command is for developer use only.')
-        else:
-            await ctx.send(':weary::gun: **Farewell...**')
-            await self.bot.logout()
-
 
 def setup(bot):
-    bot.add_cog(Tools(bot))
+    bot.add_cog(Utility(bot))

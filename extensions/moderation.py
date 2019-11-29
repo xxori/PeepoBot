@@ -39,9 +39,15 @@ class Moderation(commands.Cog):
         if muted is None:
             await ctx.send(':x: **A role called ``Muted`` is required for this command to run. Please create it before proceeding.**')
             return
+        elif muted > ctx.guild.me.top_role:
+            await ctx.send(':x: **I am not allowed to assign the ``Muted`` role. Please lower it below mine.**')
+            return
 
-        await target.add_roles(muted, reason=f'{ctx.author}: {reason or "unspecified reason"}')
-        await ctx.send(f':thumbsup: **Muted ``{target}``{f" because {reason}" if reason is not None else ""}**')
+        if target.top_role > muted:
+            await ctx.send(f':x: **``{target}`` has the role ``{target.top_role.name}`` which overrides permissions of the ``Muted`` role.**')
+        else:
+            await target.add_roles(muted, reason=f'{ctx.author}: {reason or "unspecified reason"}')
+            await ctx.send(f':thumbsup: **Muted ``{target}``{f" because {reason}" if reason is not None else ""}**')
 
     @commands.bot_has_permissions(manage_roles=True)
     @commands.has_permissions(manage_roles=True)
