@@ -27,7 +27,7 @@ class Moderation(commands.Cog):
         except discord.Forbidden:
             raise utils.HierarchyPermissionError(ctx, target)
         else:
-            await ctx.send(f':thumbsup: **Banned ``{target}``{f" for {reason}" if reason is not None else ""}**')
+            await ctx.send(f':thumbsup: **Banned ``{target}``{f" for ``{reason}``" if reason is not None else ""}**')
 
     @commands.has_permissions(kick_members=True)
     @commands.bot_has_permissions(kick_members=True)
@@ -46,7 +46,7 @@ class Moderation(commands.Cog):
         except discord.Forbidden:
             raise utils.HierarchyPermissionError(ctx, target)
         else:
-            await ctx.send(f':thumbsup: **Kicked ``{target}``{f" for {reason}" if reason is not None else ""}**')
+            await ctx.send(f':thumbsup: **Kicked ``{target}``{f" for ``{reason}``" if reason is not None else ""}**')
 
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True)
@@ -81,7 +81,7 @@ class Moderation(commands.Cog):
 
         else:
             await target.add_roles(muted, reason=f'{ctx.author}: {reason or "unspecified reason"}')
-            await ctx.send(f':thumbsup: **Muted ``{target}``{f" because {reason}" if reason is not None else ""}**')
+            await ctx.send(f':thumbsup: **Muted ``{target}``{f" for ``{reason}``" if reason is not None else ""}**')
 
     @commands.bot_has_permissions(manage_roles=True)
     @commands.has_permissions(manage_roles=True)

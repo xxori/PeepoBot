@@ -67,6 +67,9 @@ class GTXBot(commands.AutoShardedBot):
 			super(GTXBot, self).run(self.config['token'])
 		except discord.LoginFailure as e:
 			self.logger.critical(f'Login Failure - {e}')
+
+		runtime = datetime.datetime.utcnow() - self.run_time
+		self.logger.info(f'Running duration: {utils.strfdelta(runtime, "%Dd %Hh %Mm %Ss")}')
 		self.logger.info('Bot has shut down successfully.')
 
 	# events

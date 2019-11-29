@@ -19,11 +19,11 @@ class Utility(commands.Cog):
 
     @commands.command(brief='Get information about the current guild.', description='Shows useful information like membercount, rolecount and creation date')
     async def ginfo(self, ctx):
-        embed = discord.Embed()
+        embed = discord.Embed(colour=discord.Colour.blurple())
         embed.set_author(name='Guild Info')
 
         embed.add_field(name='Name', value=ctx.guild.name, inline=False)
-        embed.add_field(name='Owner', value=f'{str(ctx.guild.owner)} ({ctx.guild.owner_id})')
+        embed.add_field(name='Owner', value=str(ctx.guild.owner))
         embed.add_field(name='Created At', value=ctx.guild.created_at.strftime('%A %d %B %Y at %I:%M %p'), inline=False)
 
         botcount = len([m for m in ctx.guild.members if m.bot])
@@ -42,7 +42,8 @@ class Utility(commands.Cog):
         if not user:
             user = ctx.message.author
         embed = discord.Embed(color=user.color)
-        embed.set_author(name=f'User Info: {user.name}')
+        embed.set_author(name=f'User Info')
+        embed.add_field(name='Name', value=str(user), inline=False)
         embed.add_field(name='ID', value=user.id, inline=False)
         embed.add_field(name='Highest role', value=user.top_role, inline=False)
         embed.add_field(name='Joined Server', value=user.joined_at.strftime('%A %d %B %Y at %I:%M %p'), inline=False)
@@ -56,7 +57,7 @@ class Utility(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(
-        aliases=['ping', 'sysinfo', 'bot', 'latency'],
+        aliases=['ping', 'binfo', 'latency'],
         brief='Get information about the bot such as latency and uptime.'
     )
     async def botinfo(self, ctx):

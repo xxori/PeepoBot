@@ -23,8 +23,8 @@ class Fun(commands.Cog):
         else:
             embed = discord.Embed(color=0x00FF00)
             embed.set_author(name=f'Definition of {term}')
-            embed.add_field(name='Top Definitions: ', value=data['list'][0]['definition'], inline=False)
-            embed.add_field(name='Examples: ', value=data['list'][0]['example'], inline=False)
+            embed.add_field(name='Top Definitions: ', value=data['list'][0]['definition'].replace('[', '').replace(']', ''), inline=False)
+            embed.add_field(name='Examples: ', value=data['list'][0]['example'].replace('[', '').replace(']', ''), inline=False)
             await ctx.send(embed=embed)
 
     @commands.command(brief='Shows posts from the dankmemes subreddit')
