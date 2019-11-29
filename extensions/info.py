@@ -4,6 +4,8 @@ import asyncio
 import datetime
 import aiohttp
 import random
+import utils
+import time
 
 
 class Utility(commands.Cog):
@@ -53,15 +55,47 @@ class Utility(commands.Cog):
             embed.add_field(name='Current Activity: ', value=user.activity, inline=False)
         await ctx.send(embed=embed)
 
-    @commands.command(brief='Finds bot latency', description='Displays the bots latency in milleseconds.')
-    async def ping(self, ctx):
-        embed = discord.Embed(color=0xff0000 if self.bot.latency * 1000 > 400 else 0x00ff00)
+    @commands.command(
+        aliases=['ping', 'sysinfo', 'bot', 'latency'],
+        brief='Get information about the bot such as latency and uptime.'
+    )
+    async def botinfo(self, ctx):
+        runtime = datetime.datetime.utcnow() - self.bot.run_time
+        uptime = datetime.datetime.utcnow() - self.bot.connect_time
+        embed = discord.Embed(colour=discord.Colour.blurple())
+
+        embed.add_field(name='Uptime', value=f'''
+        Since Initialization
+        ``{utils.strfdelta(runtime, '%Dd %Hh %Mm %Ss')}``
+
+        Since Connection Start
+        ``{utils.strfdelta(uptime, '%Dd %Hh %Mm %Ss')}``''')
+
+        latency_text = f'''
+        Websocket
+        ``{int(self.bot.latency * 1000)}ms``
+
+        Message Receive
+        ``...``
+        '''
+
+        embed.add_field(name='Latency', value=latency_text)
+
+        start = time.perf_counter()
+        msg = await ctx.send(embed=embed)
+        end = time.perf_counter()
+        message_receive = int((end - start) * 1000)
+        embed.set_field_at(1, name='Latency', value=latency_text.replace('``...``', f'``{message_receive}ms``', 1))
+
+        await msg.edit(embed=embed)
+
         if random.randint(1,2) == 1:
             async with aiohttp.ClientSession() as session:
                 response = await session.get(url='https://uselessfacts.jsph.pl/random.json?language=en')
                 fact = await response.json()
                 await session.close()
             value = fact['text']
+            embed.add_field(name='Fact of the Day', value=value, inline=False)
         else:
             async with aiohttp.ClientSession() as session:
                 response = await session.get(url='https://sv443.net/jokeapi/category/Any?blacklistFlags=nsfw')
@@ -71,8 +105,9 @@ class Utility(commands.Cog):
                 value = data['setup'] + '\n' + data['delivery']
             else:
                 value = data['joke']
-        embed.add_field(name=':hourglass:' + str(round(self.bot.latency * 1000, 2)) + 'ms', value=value)
-        await ctx.send(embed=embed)
+            embed.add_field(name='Joke of the Day', value=value, inline=False)
+        await msg.edit(embed=embed)
+
 
     @commands.command(brief='Find an active channel', description='List all channels and sort by most recent activity.')
     async def active(self, ctx):

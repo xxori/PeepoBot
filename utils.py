@@ -51,3 +51,10 @@ async def is_developer(ctx):
 class HierarchyPermissionError(commands.CommandError):
     def __init__(self, ctx, target):
         super().__init__('', [ctx, target])
+
+# copied over from bartender
+def strfdelta(tdelta, fmt):
+	delta = {"D": tdelta.days}
+	delta['H'], remainder = divmod(tdelta.seconds, 3600)
+	delta['M'], delta["S"] = divmod(remainder, 60)
+	return fmt.replace('%D', str(delta['D'])).replace('%H', str(delta['H'])).replace('%M', str(delta['M'])).replace('%S', str(delta['S']))

@@ -29,9 +29,9 @@ class GTXBot(commands.AutoShardedBot):
 		self.module_directories = ['extensions']
 
 	def strfdelta(self, tdelta, fmt):
-		d = {"days": tdelta.days}
-		d["hours"], rem = divmod(tdelta.seconds, 3600)
-		d["minutes"], d["seconds"] = divmod(rem, 60)
+		d = {"D": tdelta.days}
+		d["H"], rem = divmod(tdelta.seconds, 3600)
+		d["M"], d["S"] = divmod(rem, 60)
 		return fmt.format(**d)
 
 	def load_cogs(self):
