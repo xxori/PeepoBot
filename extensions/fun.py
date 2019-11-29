@@ -2,8 +2,8 @@ import aiohttp
 import discord
 from discord.ext import commands
 
-class Fun(commands.Cog):
 
+class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -13,9 +13,10 @@ class Fun(commands.Cog):
 
     @commands.command(brief='Defines with Urban Dictionary')
     async def urban(self, ctx, *, term):
-        url = 'http://api.urbandictionary.com/v0/define'
-        async with aiohttp.ClientSession().get(url, params={'term': term}) as response:
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(url='http://api.urbandictionary.com/v0/define', params={'term': term})
             data = await response.json()
+            await session.close()
         if len(data['list']) == 0:
             embed = discord.Embed(description='No Results Found!', color=0xFF0000)
             await ctx.send(embed=embed)
