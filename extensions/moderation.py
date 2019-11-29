@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-
+import utils
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
@@ -64,6 +64,29 @@ class Moderation(commands.Cog):
         else:
             await ctx.send(f':x: **``{target}`` is not muted.**')
 
+    @commands.has_permissions(manage_channels=True)
+    @commands.command(brief='Execute command as another user.', usage='<user> <command>')
+    async def sudo(self, ctx, user: discord.Member, *, cmd):
+        if utils.check_dev(user.id):
+            await ctx.send(f':x: **You cannot execute commands as ``{user}`` because they are a bot developer.**')
+            return
+
+        elif ctx.guild.owner_id == user.id:
+            await ctx.send(f':x: **You cannot execute commands as ``{user}`` because they are the server owner.**')
+            return
+
+        elif (user.top_role > ctx.message.author.top_role) and ctx.guild.owner_id != ctx.message.author.id:
+            await ctx.send(f':x: **You are not authorised to execute commands as ``{user}``.**')
+            return
+
+        else:
+            await ctx.send(f'**Sudoing ``{cmd}`` as ``{user}``.**')
+
+        sudo_msg = ctx.message
+        sudo_msg.author = user
+        sudo_msg.content = ctx.prefix + cmd.replace(ctx.prefix, '', 1)
+        sudo_ctx = await self.bot.get_context(sudo_msg)
+        await self.bot.invoke(sudo_ctx)
 
 def setup(bot):
     bot.add_cog(Moderation(bot))

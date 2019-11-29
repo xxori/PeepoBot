@@ -35,8 +35,11 @@ def format_thousands(num):
     else:
         return num
 
+def check_dev(id):
+    return id in [308034225137778698, 304219290649886720]
+
 async def is_developer(ctx):
-    if ctx.message.author.id not in [308034225137778698, 304219290649886720]:
+    if not check_dev(ctx.message.author.id):
         await ctx.send(f':x: **You need to be a bot developer to run ``{ctx.command.name}``.**')
         return False
     return True

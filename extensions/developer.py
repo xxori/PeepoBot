@@ -28,9 +28,16 @@ class Developer(commands.Cog):
 
     @commands.check(utils.is_developer)
     @commands.command(brief='Die bitch')
-    async def die(self, ctx):
+    async def suicide(self, ctx):
         await ctx.send(':weary::gun: **Farewell...**')
         await self.bot.logout()
+
+    @commands.check(utils.is_developer)
+    @commands.command(brief='Update presences rotation')
+    async def updatepres(self, ctx):
+        self.bot.presence_looping = False
+        self.bot.loop.create_task(self.bot.presence_changer())
+        await ctx.send(':thumbsup: **Presence loop restarted.**')
 
 
 def setup(bot):

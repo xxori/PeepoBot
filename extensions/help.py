@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
+import traceback
 
 
 class HelpCommand(commands.HelpCommand):
@@ -48,7 +49,9 @@ class HelpCommand(commands.HelpCommand):
             doc = '\n```asciidoc\n'+'\n'.join(chunk).strip('```') + '```'
             if idx == 0:
                 doc = '``Bot Commands``' + doc
-            await self.context.author.send(doc)
+
+            if len(doc.strip()):
+                await self.context.author.send(doc)
 
     async def send_command_help(self, cmd):
         cmd_name = "|".join(cmd.aliases) if len(cmd.aliases) else cmd.name
@@ -56,11 +59,18 @@ class HelpCommand(commands.HelpCommand):
         cmd_info = f'{self.clean_prefix}{cmd_name} {cmd.usage or ""}'
 
         text = f'```asciidoc\n{cmd_info}\n* {cmd_desc}```'
+
         await self.context.author.send(text)
         await self.get_destination().send(f"{self.context.author.mention} :point_right: **Check your DM's!**")
 
     async def command_not_found(self, string):
         await self.get_destination().send(f":x: ``{string}`` isn't a command, check your spelling.")
+
+    async def send_error_message(self, error):
+        pass
+
+    async def on_help_command_error(self, ctx, e):
+        traceback.print_exception(type(e), e, e.__traceback__)
 
 
 def setup(bot):

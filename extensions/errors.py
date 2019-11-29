@@ -41,6 +41,9 @@ class ErrorHandler(commands.Cog):
             await asyncio.sleep(2)
             await ctx.message.remove_reaction("🤔", self.bot.user)
 
+        elif isinstance(e, discord.HTTPException):
+            traceback.print_exception(type(e), e, e.__traceback__)
+
         else:
             await ctx.send(f':x: **An internal error has occurred.** ```py\n{e}```')
             traceback.print_exception(type(e), e, e.__traceback__)

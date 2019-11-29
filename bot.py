@@ -24,6 +24,7 @@ class GTXBot(commands.AutoShardedBot):
 		self.run_time = None
 		self.connect_time = None
 		self.presences = []
+		self.presence_looping = True
 
 		self.module_directories = ['extensions']
 
@@ -100,7 +101,7 @@ class GTXBot(commands.AutoShardedBot):
 		presences = utils.Cycle(possible)
 		presences.index = random.randint(0, len(possible)-1)
 
-		while True:
+		while self.presence_looping:
 			if self.is_ready():
 				await self.change_presence(activity=presences.current)
 				presences.next()
