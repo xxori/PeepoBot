@@ -104,6 +104,14 @@ class Tools(commands.Cog):
             self.bot.reload_extension(f'extensions.{cog}')
             await ctx.send(f":white_check_mark: **Extension `{cog}` successfully reloaded**")
 
+    @commands.command(brief='Die bitch')
+    async def die(self, ctx):
+        if ctx.message.author.id not in [308034225137778698, 304219290649886720]:
+            await ctx.send(f'Sorry, {ctx.message.author.mention}, this command is for developer use only.')
+        else:
+            await ctx.send(':weary::gun: **Farewell...**')
+            await self.bot.logout()
+
 
 def setup(bot):
     bot.add_cog(Tools(bot))

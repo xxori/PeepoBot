@@ -16,7 +16,8 @@ class ErrorHandler(commands.Cog):
             await ctx.send(f':x: **``{ctx.command.name}`` requires the ``{e.param}`` argument!**')
 
         elif isinstance(e, commands.MissingPermissions):
-            await ctx.send(f':closed_lock_with_key: **You need ``{e.args}`` to be able to execute ``{ctx.command.name}``**')
+            perm_name = e.args[0].replace('You are missing ', '').replace(' permission(s) to run this command.', '').strip()
+            await ctx.send(f':closed_lock_with_key: **You need ``{perm_name}`` to be able to execute ``{ctx.command.name}``**')
 
         elif isinstance(e, commands.BotMissingPermissions):
             perm_name = e.args[0].replace('Bot requires ', '').replace(' permission(s) to run this command.', '').strip()
@@ -26,10 +27,13 @@ class ErrorHandler(commands.Cog):
             await ctx.send(f':closed_lock_with_key: **``{ctx.command.name}`` can be executed only by bot developers.**')
 
         elif isinstance(e, commands.BadArgument):
-            await ctx.send(f':x: **Argument {e.args[0]} is invalid.**')
+            await ctx.send(f':x: **{e.args[0]}**')
 
         elif isinstance(e, commands.CheckFailure):
             await ctx.send(f':x: **You do not meet the execution requirements for ``{ctx.command.name}``**')
+
+        elif isinstance(e, discord.Forbidden):
+            await ctx.send(f':x: **I am not authorized to {command.name} ``{target}``.**')
 
         elif isinstance(e, commands.CommandNotFound):
             await ctx.message.add_reaction("🤔")
