@@ -123,3 +123,8 @@ async def modify_user(id, parameter, value):
     await c.execute(f'UPDATE users SET {parameter} = {value} WHERE id = {id}')
     await c.commit()
     await c.close()
+
+async def get_user(id):
+    c = await get_connector()
+    cursor = await c.execute(f'SELECT * FROM users WHERE id = {id}')
+    return await cursor.fetchone()
