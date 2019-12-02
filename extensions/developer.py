@@ -38,13 +38,15 @@ class Developer(commands.Cog):
     @commands.check(utils.is_developer)
     @commands.command(brief='niga')
     async def load(self, ctx, cog):
-        await self.bot.load_extension(cog)
-        await ctx.send(f":white_check_mark: **Extensions ``{cog}`` successfully loaded")
+        self.bot.load_extension(f'extensions.{cog}')
+        await ctx.send(f":white_check_mark: **Extension ``{cog}`` successfully loaded**")
 
     @commands.check(utils.is_developer)
     @commands.command(brief='Unloads a loaded extension')
     async def unload(self, ctx, cog):
-        await self.bot.unload_extension(cog)
+        self.bot.unload_extension(f'extensions.{cog}')
+        await ctx.send(f":white_check_mark:** Extension ``{cog}`` successfully loadn't"**)
+
 
 def setup(bot):
     bot.add_cog(Developer(bot))
