@@ -76,7 +76,7 @@ class GTXBot(commands.AutoShardedBot):
 	# events
 
 	async def on_message(self, message):
-		if self.initialization_finished() and self.is_ready:
+		if self.initialization_finished and self.is_ready:
 			await super().on_message(message)
 
 		"""

@@ -128,3 +128,4 @@ async def get_user(id):
     c = await get_connector()
     cursor = await c.execute(f'SELECT * FROM users WHERE id = {id}')
     return await cursor.fetchone()
+    await c.close()
