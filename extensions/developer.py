@@ -3,6 +3,7 @@ from discord.ext import commands
 import asyncio
 import datetime
 import random
+import subprocess
 
 # helpful functions
 import utils
@@ -18,12 +19,7 @@ class Developer(commands.Cog):
     @commands.check(utils.is_developer)
     @commands.command(brief='Reloads a cog (for developer use only)', usage='[cog]')
     async def reload(self, ctx, cog):
-        try:
-            self.bot.reload_extension(f'extensions.{cog}')
-        except commands.ExtensionNotLoaded:
-            await ctx.send(f':x: **Extension ``{cog}`` is not loaded.**')
-            return
-
+        self.bot.reload_extension(f'extensions.{cog}')
         await ctx.send(f":white_check_mark: **Extension ``{cog}`` successfully reloaded**")
 
     @commands.check(utils.is_developer)
@@ -39,6 +35,16 @@ class Developer(commands.Cog):
         self.bot.loop.create_task(self.bot.presence_changer())
         await ctx.send(':thumbsup: **Presence loop restarted.**')
 
+    @commands.check(utils.is_developer)
+    @commands.command(brief='niga')
+    async def load(self, ctx, cog):
+        await self.bot.load_extension(cog)
+        await ctx.send(f":white_check_mark: **Extensions ``{cog}`` successfully loaded")
+
+    @commands.check(utils.is_developer)
+    @commands.command(brief='Unloads a loaded extension')
+    async def unload(self, ctx, cog):
+        await self.bot.unload_extension(cog)
 
 def setup(bot):
     bot.add_cog(Developer(bot))
