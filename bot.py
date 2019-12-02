@@ -29,6 +29,9 @@ class GTXBot(commands.AutoShardedBot):
 
 		self.module_directories = ['extensions']
 
+		# USE THIS INSTEAD OF IS_READY!!!!!!!!! DATABASE ISSUES
+		self.initialization_finished = False
+
 	def strfdelta(self, tdelta, fmt):
 		d = {"D": tdelta.days}
 		d["H"], rem = divmod(tdelta.seconds, 3600)
@@ -59,9 +62,6 @@ class GTXBot(commands.AutoShardedBot):
 		with open('presences.txt', 'r+') as f:
 			self.presences = f.read().splitlines()
 		self.logger.info(f'Loaded ({len(self.presences)}) presences.')
-
-		self.logger.info('Initializing database.')
-		self.loop.run_until_complete(dbcontrol.initialize_tables(bot))
 		self.logger.info('Pre-start checks cleared, start login.')
 
 		try:
@@ -76,8 +76,9 @@ class GTXBot(commands.AutoShardedBot):
 	# events
 
 	async def on_message(self, message):
-		if self.is_ready():
+		if self.initialization_finished() and self.is_ready:
 			await super().on_message(message)
+
 		"""
 		threads = {
 			647776725031190558: 'f',
@@ -93,12 +94,18 @@ class GTXBot(commands.AutoShardedBot):
 		"""
 
 	async def on_ready(self):
+		self.logger.info('Initializing database.')
+		await dbcontrol.initialize_tables(self)
+
 		old_time = self.connect_time
 		self.connect_time = datetime.datetime.utcnow()
 		self.logger.info(f'Connection time reset. ({old_time or "n/a"} -> {self.connect_time})')
 		self.logger.info(f'Client ready: {self.user} ({self.user.id})')
 		self.loop.create_task(self.presence_changer())
 		self.logger.info(f'Started presence loop.')
+
+		self.logger.info('Marking initialization_finished.')
+		self.initialization_finished = True
 
 	async def presence_changer(self):
 		possible = [discord.Game(name=i) for i in self.presences]

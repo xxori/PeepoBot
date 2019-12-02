@@ -33,7 +33,7 @@ async def rebuild_users(bot):
     c = await get_connector()
 
     for member in bot.get_all_members():
-        add_user(member.id, bot)
+        await add_user(member.id, bot)
 
     await c.commit()
     await c.close()
@@ -97,7 +97,7 @@ async def add_user(id, bot):
         'pingmonitor': False,
     }
 
-    user = await bot.get_user(id)
+    user = bot.get_user(id)
     if user is None:
         return False
 
@@ -107,7 +107,8 @@ async def add_user(id, bot):
     guilds = [guild for guild in bot.guilds if user in guild.members]
 
     if not data:
-        await c.execute(f'INSERT INTO users VALUES ({id}, "[]", 1, 0, {json.dumps(settings_template)})')
+        settings = json.dumps(settings_template).replace("'", "''")
+        await c.execute(f"INSERT INTO users VALUES ({id}, '{[i.id for i in guilds]}', 1, 0, '{settings}')")
     else:
         await c.execute(f'UPDATE users SET seen_in = "{[i.id for i in guilds]}" WHERE id = {id}')
     await c.commit()
