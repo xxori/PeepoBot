@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import traceback
+import dbcontrol
 import datetime
 import asyncio
 import logging
@@ -59,8 +60,8 @@ class GTXBot(commands.AutoShardedBot):
 			self.presences = f.read().splitlines()
 		self.logger.info(f'Loaded ({len(self.presences)}) presences.')
 
-		#self.logger.info('Initializing database.')
-		#self.loop.run_until_complete(dbcontrol.initialize_tables(bot))
+		self.logger.info('Initializing database.')
+		self.loop.run_until_complete(dbcontrol.initialize_tables(bot))
 		self.logger.info('Pre-start checks cleared, start login.')
 
 		try:
