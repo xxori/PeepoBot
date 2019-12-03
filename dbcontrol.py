@@ -129,3 +129,15 @@ async def get_user(id):
     cursor = await c.execute(f'SELECT * FROM users WHERE id = {id}')
     return await cursor.fetchone()
     await c.close()
+
+async def add_tag(author, created, name, content):
+    c = await get_connector()
+    await c.execute(f'INSERT INTO tags VALUES (?, ?, ?, ?)', (author, created, name, content))
+    await c.commit()
+    await c.close()
+
+async def get_tag(name):
+    c = await get_connector()
+    cursor = await c.execute(f'SELECT * FROM tags WHERE name = {name}')
+    return await cursor.fetchone()
+    await c.close()

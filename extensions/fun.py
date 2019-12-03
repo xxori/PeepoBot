@@ -1,7 +1,7 @@
 import aiohttp
 import discord
 from discord.ext import commands
-
+import dbcontrol
 
 class Fun(commands.Cog):
     def __init__(self, bot):
@@ -32,9 +32,21 @@ class Fun(commands.Cog):
         async with aiohttp.ClientSession() as session:
             response = await session.get(url='https://meme-api.herokuapp.com/gimme/dankmemes')
             data = await response.json()
+            await session.close()
         embed = discord.Embed(title=data['title'])
         embed.set_image(url=data['url'])
         await ctx.send(embed=embed)
+
+    @commands.command(brief='Adds a tag')
+    async def addtag(self, ctx, name, *, content):
+        await dbcontrol.add_tag(author=ctx.message.author.id, created=ctx.message.created_at, name=name, content=content)
+        await ctx.send(f":white_check_mark: **Tag {name} successfully added!**")
+
+    @commands.command(brief='Gets a tag')
+    async def tag(self, ctx, *, name):
+        tag = await dbcontrol.get_tag(name)
+        await ctx.send(tag)
+
 
 
 def setup(bot):
