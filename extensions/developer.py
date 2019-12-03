@@ -45,7 +45,7 @@ class Developer(commands.Cog):
     @commands.command(brief='Unloads a loaded extension')
     async def unload(self, ctx, cog):
         self.bot.unload_extension(f'extensions.{cog}')
-        await ctx.send(f":white_check_mark:** Extension ``{cog}`` successfully loadn't"**)
+        await ctx.send(f":white_check_mark:** Extension ``{cog}`` successfully loadn't**")
 
 
 def setup(bot):
