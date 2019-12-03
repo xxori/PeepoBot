@@ -1,8 +1,9 @@
 import aiosqlite
 import json
-
 from discord.ext import commands
 import discord
+from pytz import timezone
+from datetime import datetime
 
 def dict_factory(cursor, row):
     d = {}
@@ -130,14 +131,20 @@ async def get_user(id):
     return await cursor.fetchone()
     await c.close()
 
-async def add_tag(author, created, name, content):
+async def add_tag(author, name, content):
     c = await get_connector()
-    await c.execute(f'INSERT INTO tags VALUES (?, ?, ?, ?)', (author, created, name, content))
+    await c.execute(f'INSERT INTO tags VALUES (?, ?, ?, ?)', (author.id, datetime.now(timezone("Australia/Adelaide")), name, content))
     await c.commit()
     await c.close()
 
 async def get_tag(name):
     c = await get_connector()
-    cursor = await c.execute(f'SELECT * FROM tags WHERE name = {name}')
+    cursor = await c.execute(f'SELECT * FROM tags WHERE name = "{name}"')
     return await cursor.fetchone()
+    await c.close()
+
+async def run_command(command):
+    c = await get_connector()
+    await c.execute(command)
+    await c.commit()
     await c.close()

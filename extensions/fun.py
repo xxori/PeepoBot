@@ -2,6 +2,8 @@ import aiohttp
 import discord
 from discord.ext import commands
 import dbcontrol
+from pytz import timezone
+import aiosqlite
 
 class Fun(commands.Cog):
     def __init__(self, bot):
@@ -39,14 +41,16 @@ class Fun(commands.Cog):
 
     @commands.command(brief='Adds a tag')
     async def addtag(self, ctx, name, *, content):
-        await dbcontrol.add_tag(author=ctx.message.author.id, created=ctx.message.created_at, name=name, content=content)
+        await dbcontrol.add_tag(author=ctx.message.author, name=name, content=content)
         await ctx.send(f":white_check_mark: **Tag {name} successfully added!**")
 
     @commands.command(brief='Gets a tag')
     async def tag(self, ctx, *, name):
-        tag = await dbcontrol.get_tag(name)
-        await ctx.send(tag)
-
+        try:
+            tag = await dbcontrol.get_tag(name)
+            embed
+        except aiosqlite.OperationalError:
+            await ctx.send(f"**No tag with the name `{name}` currently exists.**")
 
 
 def setup(bot):

@@ -4,6 +4,7 @@ import asyncio
 import datetime
 import random
 import subprocess
+import dbcontrol
 
 # helpful functions
 import utils
@@ -46,6 +47,11 @@ class Developer(commands.Cog):
     async def unload(self, ctx, cog):
         self.bot.unload_extension(f'extensions.{cog}')
         await ctx.send(f":white_check_mark:** Extension ``{cog}`` successfully loadn't**")
+
+    @commands.check(utils.is_developer)
+    @commands.command(brief='Runs an SQL command')
+    async def sql(self, ctx, *, command):
+        await dbcontrol.run_command(command)
 
 
 def setup(bot):
