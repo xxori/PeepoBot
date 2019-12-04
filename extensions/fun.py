@@ -39,25 +39,5 @@ class Fun(commands.Cog):
         embed.set_image(url=data['url'])
         await ctx.send(embed=embed)
 
-    @commands.command(brief='Adds a tag')
-    async def addtag(self, ctx, name, *, content):
-        await dbcontrol.add_tag(author=ctx.message.author, name=name, content=content)
-        await ctx.send(f":white_check_mark: **Tag {name} successfully added!**")
-
-    @commands.command(brief='Gets a tag')
-    async def tag(self, ctx, *, name):
-        try:
-            tag = await dbcontrol.get_tag(name)
-            author = self.bot.get_user(tag['author'])
-            embed = discord.Embed(title=tag['name'], color=author.color)
-            embed.set_thumbnail(url=author.avatar_url)
-            embed.set_footer(text=f"Created on {tag['created']}")
-            embed.add_field(name=tag['content'], value=f"Created by {author.mention}")
-            await ctx.send(embed=embed)
-
-        except aiosqlite.OperationalError:
-            await ctx.send(f"**No tag with the name `{name}` currently exists.**")
-
-
 def setup(bot):
     bot.add_cog(Fun(bot))
