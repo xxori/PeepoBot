@@ -48,7 +48,13 @@ class Fun(commands.Cog):
     async def tag(self, ctx, *, name):
         try:
             tag = await dbcontrol.get_tag(name)
-            embed
+            author = self.bot.get_user(tag['author'])
+            embed = discord.Embed(title=tag['name'], color=author.color)
+            embed.set_thumbnail(url=author.avatar_url)
+            embed.set_footer(text=f"Created on {tag['created']}")
+            embed.add_field(name=tag['content'], value=f"Created by {author.mention}")
+            await ctx.send(embed=embed)
+
         except aiosqlite.OperationalError:
             await ctx.send(f"**No tag with the name `{name}` currently exists.**")
 
