@@ -133,7 +133,7 @@ async def get_user(id):
 
 async def add_tag(author, name, content):
     c = await get_connector()
-    await c.execute(f'INSERT INTO tags VALUES (?, ?, ?, ?)', (author.id, datetime.now(timezone("Australia/Adelaide")), name, content))
+    await c.execute(f'INSERT INTO tags VALUES (?, ?, ?, ?)', (author.id, datetime.now(timezone("Australia/Adelaide")).strftime('%A %d %B %Y at %I:%M %p'), name, content))
     await c.commit()
     await c.close()
 
