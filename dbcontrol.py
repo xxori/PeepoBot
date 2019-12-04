@@ -2,7 +2,6 @@ import aiosqlite
 import json
 from discord.ext import commands
 import discord
-from pytz import timezone
 from datetime import datetime
 
 def dict_factory(cursor, row):
@@ -18,7 +17,7 @@ async def get_connector():
 
 async def initialize_tables(bot):
     c = await get_connector()
-    await c.execute('CREATE TABLE IF NOT EXISTS users(id INTEGER, seen_in TEXT, level INTEGER, exp INTEGER, settings TEXT)')
+    await c.execute('CREATE TABLE IF NOT EXISTS users(id INTEGER, seen_in TEXT, level INTEGER, exp INTEGER, exp_threshold INTEGER, settings TEXT, bio TEXT, profile_image TEXT)')
     await c.execute('CREATE TABLE IF NOT EXISTS tags(author INTEGER, created REAL, name TEXT, content TEXT)')
     await c.execute('CREATE TABLE IF NOT EXISTS guilds(id INTEGER, prefix TEXT, logchannel INTEGER, muterole INTEGER, announcechannel INTEGER)')
 
