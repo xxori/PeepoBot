@@ -41,6 +41,9 @@ class ErrorHandler(commands.Cog):
             # checks should handle their own error messages
             pass
 
+        if isinstance(e, commands.ExtensionNotFound):
+            await ctx.send(f':x: Extension ``{e.args[0]}`` does not exist.')
+
         elif isinstance(e, discord.Forbidden):
             await ctx.send(f':x: **I am not authorized to do that.**')
 
@@ -51,6 +54,12 @@ class ErrorHandler(commands.Cog):
 
         elif isinstance(e, discord.HTTPException):
             traceback.print_exception(type(e), e, e.__traceback__)
+
+        elif isinstance(e, commands.ExtensionAlreadyLoaded):
+            await ctx.send(f':x: Extension ``{e.args[0]}`` is already loaded.')
+
+        elif isinstance(e, commands.ExtensionNotLoaded):
+            await ctx.send(f':x: Extension ``{e.args[0]}`` is not loaded.')
 
         else:
             await ctx.send(f':x: **An internal error has occurred.** ```py\n{e}```')

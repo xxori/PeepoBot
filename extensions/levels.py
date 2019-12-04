@@ -28,7 +28,7 @@ class Leveling(commands.Cog):
         embed.set_author(name=str(user), icon_url=user.avatar_url)
 
         exp_required = int(((level+1**2 - level+1)*self.level_threshold)/2)
-        embed.description = f':small_blue_diamond: **Level:** {level}\n:small_orange_diamond: **EXP: ``{exp}/{exp_required}``**'
+        embed.description = f':small_blue_diamond: **Level:** {level}\n:small_orange_diamond: **EXP:** {exp}/{exp_required}**'
         await ctx.send(embed=embed)
 
 def setup(bot):

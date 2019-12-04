@@ -48,6 +48,21 @@ async def is_developer(ctx):
         return False
     return True
 
+def punctuate_number(number, div=','):
+    '''
+    1234 -> 1,234
+    123456789 ->
+    '''
+    out = ''
+    c = 0
+    for char in reversed(str(number)):
+        if c > 2:
+            out += div
+            c = 0
+        out += char
+        c+=1
+    return ''.join(reversed(out))
+
 class HierarchyPermissionError(commands.CommandError):
     def __init__(self, ctx, target):
         super().__init__('', [ctx, target])

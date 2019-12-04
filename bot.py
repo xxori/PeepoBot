@@ -12,8 +12,6 @@ import time
 import sys
 import os
 
-
-
 class GTXBot(commands.AutoShardedBot):
     def __init__(self, logger, config):
         super(GTXBot, self).__init__(command_prefix=commands.when_mentioned_or('$'))
