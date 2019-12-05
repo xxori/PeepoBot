@@ -13,7 +13,7 @@ class Fun(commands.Cog):
     def description(self):
         return 'Random, fun commands'
 
-    @commands.command(brief='Defines with Urban Dictionary')
+    @commands.command(brief='Defines with Urban Dictionary', aliases=['dict', 'ud'])
     async def urban(self, ctx, *, term):
         async with aiohttp.ClientSession() as session:
             response = await session.get(url='http://api.urbandictionary.com/v0/define', params={'term': term})
@@ -29,7 +29,7 @@ class Fun(commands.Cog):
             embed.add_field(name='Examples: ', value=data['list'][0]['example'].replace('[', '').replace(']', ''), inline=False)
             await ctx.send(embed=embed)
 
-    @commands.command(brief='Shows posts from the dankmemes subreddit')
+    @commands.command(brief='Shows posts from the dankmemes subreddit', aliases='dankmemes')
     async def meme(self, ctx):
         async with aiohttp.ClientSession() as session:
             response = await session.get(url='https://meme-api.herokuapp.com/gimme/dankmemes')

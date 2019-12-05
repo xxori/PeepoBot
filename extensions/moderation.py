@@ -31,7 +31,7 @@ class Moderation(commands.Cog):
 
     @commands.has_permissions(kick_members=True)
     @commands.bot_has_permissions(kick_members=True)
-    @commands.command(brief='Kicks a user from the server', usage='<user> [reason]')
+    @commands.command(brief='Kicks a user from the server', usage='<user> [reason]', aliases=['cya'])
     async def kick(self, ctx, target: discord.Member, *, reason=None):
         if ctx.guild.owner_id == target.id:
             await ctx.send(f':x: **You cannot kick ``{target}`` because they are the server owner.**')
@@ -50,7 +50,7 @@ class Moderation(commands.Cog):
 
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True)
-    @commands.command(brief='Deletes messages from the channel in bulk.', usage='[amount]')
+    @commands.command(brief='Deletes messages from the channel in bulk.', usage='[amount]', aliases=['clear'])
     async def purge(self, ctx, amount=50):
         purged = len(await ctx.channel.purge(limit=amount))
         await ctx.send(f':thumbsup: **Purged {purged} messages from <#{ctx.channel.id}>**', delete_after=2)
@@ -85,7 +85,7 @@ class Moderation(commands.Cog):
 
     @commands.bot_has_permissions(manage_roles=True)
     @commands.has_permissions(manage_roles=True)
-    @commands.command(brief='Unmutes a server member', usage='[user]')
+    @commands.command(brief='Unmutes a server member', usage='[user]', aliases=['umute'])
     async def unmute(self, ctx, target: discord.Member):
         muted = discord.utils.get(ctx.guild.roles, name='Muted')
         if muted is None:
@@ -99,7 +99,7 @@ class Moderation(commands.Cog):
             await ctx.send(f':x: **``{target}`` is not muted.**')
 
     @commands.has_permissions(manage_channels=True)
-    @commands.command(brief='Execute command as another user.', usage='<user> <command>')
+    @commands.command(brief='Execute command as another user.', usage='<user> <command>', aliases=['s', 'runas'])
     async def sudo(self, ctx, user: discord.Member, *, cmd):
         if utils.check_dev(user.id):
             await ctx.send(f':x: **You cannot execute commands as ``{user}`` because they are a bot developer.**')

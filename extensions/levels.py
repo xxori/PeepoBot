@@ -14,7 +14,7 @@ class Leveling(commands.Cog):
         super().__init__()
         self.bot = bot
 
-    @commands.command(brief='View you or a user''s level and exp.', usage='[user]')
+    @commands.command(brief='View you or a user''s level and exp.', usage='[user]', aliases=['lv', 'lvl'])
     async def level(self, ctx, user:discord.Member = None):
         if user is None:
             user = ctx.message.author
