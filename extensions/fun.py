@@ -13,7 +13,7 @@ class Fun(commands.Cog):
     def description(self):
         return 'Random, fun commands'
 
-    @commands.command(brief='Defines with Urban Dictionary', aliases=['dict', 'ud'])
+    @commands.command(brief='Defines with Urban Dictionary', aliases=['dict', 'ud'], usage='[term]')
     async def urban(self, ctx, *, term):
         async with aiohttp.ClientSession() as session:
             response = await session.get(url='http://api.urbandictionary.com/v0/define', params={'term': term})

@@ -37,7 +37,7 @@ class Utility(commands.Cog):
         embed.set_thumbnail(url=ctx.guild.icon_url)
         await ctx.send(embed=embed)
 
-    @commands.command(brief='Get information about your Discord account.', description='Shows information about ')
+    @commands.command(brief='Get information about your Discord account.', description='Shows information about ', usage='[user]')
     async def uinfo(self, ctx, user: discord.Member = None):
         if not user:
             user = ctx.message.author

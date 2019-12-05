@@ -12,7 +12,7 @@ class Moderation(commands.Cog):
 
     @commands.has_permissions(ban_members=True)
     @commands.bot_has_permissions(ban_members=True)
-    @commands.command(brief='Permanently ban a user from the server', usage='<user> [reason]')
+    @commands.command(brief='Permanently ban a user from the server', usage='[user] <reason>')
     async def ban(self, ctx, target: discord.Member, *, reason=None):
         if ctx.guild.owner_id == target.id:
             await ctx.send(f':x: **You cannot kick ``{target}`` because they are the server owner.**')
@@ -31,7 +31,7 @@ class Moderation(commands.Cog):
 
     @commands.has_permissions(kick_members=True)
     @commands.bot_has_permissions(kick_members=True)
-    @commands.command(brief='Kicks a user from the server', usage='<user> [reason]', aliases=['cya'])
+    @commands.command(brief='Kicks a user from the server', usage='[user] <reason>', aliases=['cya'])
     async def kick(self, ctx, target: discord.Member, *, reason=None):
         if ctx.guild.owner_id == target.id:
             await ctx.send(f':x: **You cannot kick ``{target}`` because they are the server owner.**')
@@ -99,7 +99,7 @@ class Moderation(commands.Cog):
             await ctx.send(f':x: **``{target}`` is not muted.**')
 
     @commands.has_permissions(manage_channels=True)
-    @commands.command(brief='Execute command as another user.', usage='<user> <command>', aliases=['s', 'runas'])
+    @commands.command(brief='Execute command as another user.', usage='[user] <command>', aliases=['s', 'runas'])
     async def sudo(self, ctx, user: discord.Member, *, cmd):
         if utils.check_dev(user.id):
             await ctx.send(f':x: **You cannot execute commands as ``{user}`` because they are a bot developer.**')
