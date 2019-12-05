@@ -20,7 +20,7 @@ class Tags(commands.Cog):
     @commands.command(brief='Gets a tag')
     async def tag(self, ctx, *, name):
         try:
-            tag = await dbcontrol.get_tag(ctx.message.author, name)
+            tag = await dbcontrol.get_tag(ctx.message.author.id, name)
             author = self.bot.get_user(tag['author'])
             embed = discord.Embed(title=tag['name'], color=0x00FF00)
             embed.set_thumbnail(url=author.avatar_url)
