@@ -139,7 +139,7 @@ async def add_tag(author, name, content):
 
 async def get_tag(author, name):
     c = await get_connector()
-    cursor = await c.execute(f'SELECT * FROM tags WHERE name = "{name}" and author = "{author}"')
+    cursor = await c.execute(f'SELECT * FROM tags WHERE name = "{name}" AND author = {author}')
     return await cursor.fetchone()
     await c.close()
 

@@ -21,12 +21,14 @@ class Developer(commands.Cog):
     @commands.command(brief='Reloads a cog (for developer use only)', usage='[cog]')
     async def reload(self, ctx, cog):
         self.bot.reload_extension(f'extensions.{cog}')
+        self.bot.logger.info(f"Cog {cog} reloaded by {ctx.message.author} ({ctx.message.author.id})")
         await ctx.send(f":white_check_mark: **Extension ``{cog}`` successfully reloaded**")
 
     @commands.check(utils.is_developer)
     @commands.command(brief='Die bitch')
     async def suicide(self, ctx):
         await ctx.send(':weary::gun: **Farewell...**')
+        self.bot.logger.info(f"Bot terminated by {ctx.message.author} ({ctx.message.author.id})")
         await self.bot.logout()
 
     @commands.check(utils.is_developer)
@@ -40,18 +42,21 @@ class Developer(commands.Cog):
     @commands.command(brief='niga')
     async def load(self, ctx, cog):
         self.bot.load_extension(f'extensions.{cog}')
+        self.bot.logger.info(f"Cog {cog} loaded by {ctx.message.author} ({ctx.message.author.id})")
         await ctx.send(f":white_check_mark: **Extension ``{cog}`` successfully loaded**")
 
     @commands.check(utils.is_developer)
     @commands.command(brief='Unloads a loaded extension')
     async def unload(self, ctx, cog):
         self.bot.unload_extension(f'extensions.{cog}')
+        self.bot.logger.info(f"Cog {cog} unloaded by {ctx.message.author} ({ctx.message.author.id})")
         await ctx.send(f":white_check_mark:** Extension ``{cog}`` successfully loadn't**")
 
     @commands.check(utils.is_developer)
     @commands.command(brief='Runs an SQL command')
     async def sql(self, ctx, *, command):
         await dbcontrol.run_command(command)
+        self.bot.logger.info(f"SQL command ({command}) run by {ctx.message.author} ({ctx.message.author.id})")
 
 
 def setup(bot):
