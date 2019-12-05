@@ -14,6 +14,10 @@ class Leveling(commands.Cog):
         super().__init__()
         self.bot = bot
 
+    @property
+    def description(self):
+        return 'Fun levelling-related commands'
+
     @commands.command(brief='View you or a user''s level and exp.', usage='[user]', aliases=['lv', 'lvl'])
     async def level(self, ctx, user:discord.Member = None):
         if user is None:

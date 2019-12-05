@@ -12,12 +12,12 @@ class Tags(commands.Cog):
     def description(self):
         return 'Tag-related commands'
 
-    @commands.command(brief='Adds a tag', aliases=['tagadd'])
+    @commands.command(brief='Adds a tag', aliases=['tagadd'], usage='[name] <tag content>')
     async def addtag(self, ctx, name, *, content):
         await dbcontrol.add_tag(author=ctx.message.author, name=name, content=content)
         await ctx.send(f":white_check_mark: **Tag {name} successfully added!**")
 
-    @commands.command(brief='Gets a tag', aliases=['gettag'])
+    @commands.command(brief='Gets a tag', aliases=['gettag'], usage='[tag name]')
     async def tag(self, ctx, *, name):
         try:
             tag = await dbcontrol.get_tag(ctx.message.author.id, name)
@@ -35,7 +35,7 @@ class Tags(commands.Cog):
         except aiosqlite.OperationalError:
             await ctx.send(':x: **Tag ``{}`` could not be found.**'.format(name))
 
-    @commands.command(brief='Deletes a tag', aliases=['deletetag', 'notag'])
+    @commands.command(brief='Deletes a tag', aliases=['deletetag', 'notag'], usage='[tag name]')
     async def deltag(self, ctx, *, name):
         try:
             tag = await dbcontrol.get_tag(ctx.author.id, name)

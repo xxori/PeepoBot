@@ -39,21 +39,21 @@ class Developer(commands.Cog):
         await ctx.send(':thumbsup: **Presence loop restarted.**')
 
     @commands.check(utils.is_developer)
-    @commands.command(brief='niga')
+    @commands.command(brief='niga', usage='[cog]')
     async def load(self, ctx, cog):
         self.bot.load_extension(f'extensions.{cog}')
         self.bot.logger.info(f"Cog {cog} loaded by {ctx.message.author} ({ctx.message.author.id})")
         await ctx.send(f":white_check_mark: **Extension ``{cog}`` successfully loaded**")
 
     @commands.check(utils.is_developer)
-    @commands.command(brief='Unloads a loaded extension', aliases=['uload'])
+    @commands.command(brief='Unloads a loaded extension', aliases=['uload'], usage='[cog]')
     async def unload(self, ctx, cog):
         self.bot.unload_extension(f'extensions.{cog}')
         self.bot.logger.info(f"Cog {cog} unloaded by {ctx.message.author} ({ctx.message.author.id})")
         await ctx.send(f":white_check_mark:** Extension ``{cog}`` successfully loadn't**")
 
     @commands.check(utils.is_developer)
-    @commands.command(brief='Runs an SQL command', aliases=['sequel', 'database', 'db'])
+    @commands.command(brief='Runs an SQL command', aliases=['sequel', 'database', 'db'], usage='[sql command]')
     async def sql(self, ctx, *, command):
         await dbcontrol.run_command(command)
         self.bot.logger.info(f"SQL command ({command}) run by {ctx.message.author} ({ctx.message.author.id})")
