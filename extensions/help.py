@@ -30,7 +30,7 @@ class HelpCommand(commands.HelpCommand):
 
                 if len(cmds) > 0:
                     for cmd in cmds:
-                        cmd_name = "|".join(cmd.aliases) if len(cmd.aliases) else cmd.name
+                        cmd_name = cmd.name + "|" + "|".join(cmd.aliases) if len(cmd.aliases) else cmd.name
                         cmd_desc = cmd.brief or cmd.description[:20] or "No Description"
 
                         cmd_info = f'{self.clean_prefix}{cmd_name} {cmd.usage or ""}'
