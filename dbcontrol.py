@@ -109,7 +109,7 @@ async def add_user(id, bot):
 
     if not data:
         settings = json.dumps(settings_template).replace("'", "''")
-        await c.execute(f"INSERT INTO users VALUES ({id}, '{[i.id for i in guilds]}', 1, 0, '{settings}')")
+        await c.execute(f"INSERT INTO users VALUES ({id}, '{[i.id for i in guilds]}', 1, 0, 100, '{settings}', '', '')")
     else:
         await c.execute(f'UPDATE users SET seen_in = "{[i.id for i in guilds]}" WHERE id = {id}')
     await c.commit()
@@ -139,7 +139,7 @@ async def add_tag(author, name, content):
 
 async def get_tag(author, name):
     c = await get_connector()
-    cursor = await c.execute(f'SELECT * FROM tags WHERE name = "{name}" AND author = {author}')
+    cursor = await c.execute(f'SELECT * FROM tags WHERE name = "{name}" AND author = "{author}"')
     return await cursor.fetchone()
     await c.close()
 
