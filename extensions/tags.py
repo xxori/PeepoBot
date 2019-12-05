@@ -22,7 +22,7 @@ class Tags(commands.Cog):
         try:
             tag = await dbcontrol.get_tag(ctx.message.author.id, name)
             if tag is None:
-                await ctx.send(':x: **Tag ``{}`` could not be found.**')
+                await ctx.send(':x: **Tag ``{}`` could not be found.**'.format(name))
                 return
 
             author = self.bot.get_user(tag['author'])
@@ -33,7 +33,7 @@ class Tags(commands.Cog):
             await ctx.send(embed=embed)
 
         except aiosqlite.OperationalError:
-            await ctx.send(':x: **Tag ``{}`` could not be found.**')
+            await ctx.send(':x: **Tag ``{}`` could not be found.**'.format(name))
 
 def setup(bot):
     bot.add_cog(Tags(bot))
