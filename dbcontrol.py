@@ -143,6 +143,12 @@ async def get_tag(author, name):
     return await cursor.fetchone()
     await c.close()
 
+async def delete_tag(author, name):
+    c = await get_connector()
+    await c.execute(f'DELETE FROM tags WHERE author = "{author}" AND name = "{name}"')
+    await c.commit()
+    await c.close()
+
 async def run_command(command):
     c = await get_connector()
     await c.execute(command)

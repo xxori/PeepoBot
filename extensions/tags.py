@@ -35,5 +35,17 @@ class Tags(commands.Cog):
         except aiosqlite.OperationalError:
             await ctx.send(':x: **Tag ``{}`` could not be found.**'.format(name))
 
+    @commands.command(brief='Deletes a tag')
+    async def deltag(self, ctx, *, name):
+        try:
+            tag = await dbcontrol.get_tag(ctx.author.id, name)
+            if tag:
+                await dbcontrol.delete_tag(ctx.author.id, name)
+                await ctx.send(f":white_check_mark: **Tag ``{name}`` successfully deleted!**")
+            else:
+              await ctx.send(':x: **Tag ``{}`` could not be found.**'.format(name))
+        except aiosqlite.OperationalError:
+            await ctx.send(':x: **Tag ``{}`` could not be found.**'.format(name))
+
 def setup(bot):
     bot.add_cog(Tags(bot))
