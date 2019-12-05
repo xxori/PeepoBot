@@ -28,7 +28,11 @@ class Developer(commands.Cog):
     @commands.command(brief='Die bitch', aliases=['die', 'fuckoff'])
     async def suicide(self, ctx):
         await ctx.send(':weary::gun: **Farewell...**')
-        self.bot.logger.info(f"Bot terminated from {ctx.message.guild} ({ctx.message.guild.id}) by {ctx.message.author} ({ctx.message.author.id})")
+        if ctx.message.guild:
+            self.bot.logger.info(f"Bot terminated from {ctx.message.guild} ({ctx.message.guild.id}) by {ctx.message.author} ({ctx.message.author.id})")
+        else:
+            self.bot.logger.info(
+                f"Bot terminated from dms by {ctx.message.author} ({ctx.message.author.id})")
         await self.bot.logout()
 
     @commands.check(utils.is_developer)
