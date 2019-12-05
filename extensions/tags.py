@@ -21,6 +21,10 @@ class Tags(commands.Cog):
     async def tag(self, ctx, *, name):
         try:
             tag = await dbcontrol.get_tag(ctx.message.author.id, name)
+            if tag is None:
+                await ctx.send(':x: **Tag ``{}`` could not be found.**')
+                return
+
             author = self.bot.get_user(tag['author'])
             embed = discord.Embed(title=tag['name'], color=0x00FF00)
             embed.set_thumbnail(url=author.avatar_url)
@@ -29,8 +33,7 @@ class Tags(commands.Cog):
             await ctx.send(embed=embed)
 
         except aiosqlite.OperationalError:
-            await ctx.send(f"**No tag with the name `{name}` currently exists.**")
-
+            await ctx.send(':x: **Tag ``{}`` could not be found.**')
 
 def setup(bot):
     bot.add_cog(Tags(bot))
