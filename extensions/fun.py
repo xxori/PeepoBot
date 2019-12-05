@@ -29,7 +29,7 @@ class Fun(commands.Cog):
             embed.add_field(name='Examples: ', value=data['list'][0]['example'].replace('[', '').replace(']', ''), inline=False)
             await ctx.send(embed=embed)
 
-    @commands.command(brief='Shows posts from the dankmemes subreddit', aliases='dankmemes')
+    @commands.command(brief='Shows posts from the dankmemes subreddit', aliases=['dankmemes'])
     async def meme(self, ctx):
         async with aiohttp.ClientSession() as session:
             response = await session.get(url='https://meme-api.herokuapp.com/gimme/dankmemes')
