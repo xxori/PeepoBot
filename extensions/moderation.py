@@ -113,8 +113,6 @@ class Moderation(commands.Cog):
             elif (user.top_role > ctx.message.author.top_role) and ctx.guild.owner_id != ctx.message.author.id:
                 await ctx.send(f':x: **You are not authorised to execute commands as ``{user}``.**')
                 return
-        else:
-            await ctx.send(':shield: **Overriding permissions because you are a bot owner.**')
 
         await ctx.send(f'**Sudoing ``{cmd}`` as ``{user}``.**')
 
