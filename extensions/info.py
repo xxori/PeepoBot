@@ -46,8 +46,8 @@ class Utility(commands.Cog):
         embed.add_field(name='Name', value=str(user), inline=False)
         embed.add_field(name='ID', value=user.id, inline=False)
         embed.add_field(name='Highest role', value=user.top_role, inline=False)
-        embed.add_field(name='Joined Server', value=user.joined_at.strftime('%A %d %B %Y at %I:%M %p'), inline=False)
-        embed.add_field(name='Account Created', value=user.created_at.strftime('%A %d %B %Y at %I:%M %p'), inline=False)
+        embed.add_field(name='Joined Server', value=user.joined_at.strftime('%A %d %B %Y at %I:%M %p (UTC)'), inline=False)
+        embed.add_field(name='Account Created', value=user.created_at.strftime('%A %d %B %Y at %I:%M %p (UTC)'), inline=False)
         embed.set_thumbnail(url=user.avatar_url)
         embed.add_field(name='Nickname: ', value=user.nick, inline=False)
         if user.activity:
