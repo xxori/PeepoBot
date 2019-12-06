@@ -63,6 +63,33 @@ class HelpCommand(commands.HelpCommand):
         await self.context.author.send(text)
         await self.get_destination().send(f"{self.context.author.mention} :point_right: **Check your DM's!**")
 
+    async def send_group_help(self, cmd):
+        cmd_name = "|".join(cmd.aliases) if len(cmd.aliases) else cmd.name
+        cmd_desc = cmd.description or cmd.brief or "No Description"
+        cmd_info = f'{self.clean_prefix}{cmd_name} {cmd.usage or ""}'
+
+        cmds = cmd.commands
+
+        if len(cmds) > 0:
+            sub = '\n\n== Subcommands =='
+            for cmd in cmds:
+                cmd_name = cmd.name + "|" + "|".join(cmd.aliases) if len(cmd.aliases) else cmd.name
+                cmd_desc = cmd.brief or cmd.description[:20] or "No Description"
+
+                cmd_info = f'{self.clean_prefix}{cmd_name} {cmd.usage or ""}'
+
+                spacer = 30-len(cmd_info)
+                if spacer < 0: spacer = 0
+
+                sub += f'\n{cmd_info} {" "*spacer}:: {cmd_desc}'
+        else:
+            sub = ''
+
+        text = f'```asciidoc\n{cmd_info}\n* {cmd_desc}{sub}```'
+
+        await self.context.author.send(text)
+        await self.get_destination().send(f"{self.context.author.mention} :point_right: **Check your DM's!**")
+
     async def command_not_found(self, string):
         await self.get_destination().send(f":x: ``{string}`` isn't a command, check your spelling.")
 
