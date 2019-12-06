@@ -6,6 +6,9 @@ import asyncio
 import pyppeteer as pyp
 from bs4 import BeautifulSoup
 
+import re
+from collections import Counter
+
 class Cycle:
     def __init__(self, elements):
         self.elements = elements
