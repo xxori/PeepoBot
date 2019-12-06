@@ -37,11 +37,11 @@ class ErrorHandler(commands.Cog):
             target = e.args[1][1]
             await ctx.send(f':x: **I am not authorized to {command.name} ``{target}``.**')
 
-        elif isinstance(e, commands.CheckFailure):
+        elif isinstance(e, commands.CheckFailure) :
             # checks should handle their own error messages
             pass
 
-        if isinstance(e, commands.ExtensionNotFound):
+        elif isinstance(e, commands.ExtensionNotFound):
             await ctx.send(f':x: Extension ``{e.args[0]}`` does not exist.')
 
         elif isinstance(e, discord.Forbidden):
@@ -62,7 +62,7 @@ class ErrorHandler(commands.Cog):
             await ctx.send(f':x: Extension ``{e.args[0]}`` is not loaded.')
 
         else:
-            await ctx.send(f':x: **An internal error has occurred.** ```py\n{e}```')
+            await ctx.send(f':x: **An internal error has occurred.** ```py\n{type(e)}: {e}```')
             traceback.print_exception(type(e), e, e.__traceback__)
 
 def setup(bot):
