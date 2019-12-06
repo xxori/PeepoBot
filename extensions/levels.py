@@ -18,7 +18,7 @@ class Leveling(commands.Cog):
     def description(self):
         return 'Fun levelling-related commands'
 
-    @commands.command(brief='View you or a user''s level and exp.', usage='[user]', aliases=['lv', 'lvl'])
+    @commands.command(brief='View you or a user''s level and exp.', usage='[user]')
     async def level(self, ctx, user:discord.Member = None):
         if user is None:
             user = ctx.message.author
@@ -26,7 +26,7 @@ class Leveling(commands.Cog):
         user_info = await dbcontrol.get_user(user.id)
         level = user_info['level']
         exp = user_info['exp']
-        exp_threshold = user_info['exp_threshold']
+        exp_required = user_info['exp_required']
 
         embed=discord.Embed(colour=discord.Colour.blurple())
         embed.set_author(name=str(user), icon_url=user.avatar_url)

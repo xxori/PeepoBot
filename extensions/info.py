@@ -65,6 +65,8 @@ class Utility(commands.Cog):
         uptime = datetime.datetime.utcnow() - self.bot.connect_time
         embed = discord.Embed(colour=discord.Colour.blurple())
 
+        embed.set_author(name=str(self.bot.user), icon_url=self.bot.user.avatar_url)
+
         embed.add_field(name='Uptime', value=f'''
         Since Initialization
         ``{utils.strfdelta(runtime, '%Dd %Hh %Mm %Ss')}``
