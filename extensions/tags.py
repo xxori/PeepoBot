@@ -13,55 +13,52 @@ class Tags(commands.Cog):
     def description(self):
         return 'Tag-related commands'
 
-    @commands.command(brief='Adds a tag', aliases=['tagadd'], usage='[name] <tag content>')
-    async def addtag(self, ctx, name, *, content):
+    @commands.group(invoke_without_command=True)
+    async def tag(self, ctx, *, name):
+        if ctx.invoked_subcommand is None:
+            tag = await dbcontrol.get_guild_tag(ctx.guild.id, name)
+            if tag is None:
+                await ctx.send(f':x: **Tag ``{name}`` could not be found.**')
+                return
+            else:
+                await ctx.send(tag['content'])
+
+    @tag.command()
+    async def create(self, ctx, name, *, content):
+        tag = await dbcontrol.get_guild_tag(ctx.guild.id, name)
+        if tag is not None:
+            await ctx.send(f':x: **Tag ``{name}`` already exists and is owned by ``{self.bot.get_user(tag["author"])}``**')
+            return
         await dbcontrol.add_tag(author=ctx.message.author, guild=ctx.guild, name=name, content=content)
         await ctx.send(f":thumbsup: **Tag ``{name}`` successfully created!**")
 
-    @commands.command(brief='Gets a tag', aliases=['gettag'], usage='<name>')
-    async def tag(self, ctx, *, name):
-        try:
-            tag = await dbcontrol.get_tag(ctx.message.author.id, ctx.guild.id, name)
-            if tag is None:
-                await ctx.send(':x: **Tag ``{}`` could not be found.**'.format(name))
-                return
-        except aiosqlite.OperationalError:
+    @tag.command()
+    async def delete(self, ctx, *, name):
+        tag = await dbcontrol.get_guild_tag(ctx.guild.id, name)
+        if tag is None:
             await ctx.send(':x: **Tag ``{}`` could not be found.**'.format(name))
-        else:
-            await ctx.send(tag['content'])
+            return
+        elif tag['author'] != ctx.message.author.id and not ctx.message.author.guild_permissions.manage_messages:
+            await ctx.send(':x: **You do not own tag ``{}``.**'.format(name))
+            return
+        await dbcontrol.delete_tag(ctx.author.id, ctx.guild.id, name)
+        await ctx.send(f":recycle: **Tag ``{name}`` deleted successfully.**")
 
-    @commands.command(brief='View info for the tag', aliases=['tinfo'], usage='<name>')
-    async def taginfo(self, ctx, *, name):
-        try:
-            tag = await dbcontrol.get_tag(ctx.message.author.id, ctx.guild.id, name)
-            if tag is None:
-                await ctx.send(':x: **Tag ``{}`` could not be found.**'.format(name))
-                return
-        except aiosqlite.OperationalError:
+    @tag.command()
+    async def info(self, ctx, *, name):
+        tag = await dbcontrol.get_guild_tag(ctx.guild.id, name)
+        if tag is None:
             await ctx.send(':x: **Tag ``{}`` could not be found.**'.format(name))
-        else:
-            author = self.bot.get_user(tag['author'])
+            return
+        author = self.bot.get_user(tag['author'])
 
-            embed = discord.Embed(colour=discord.Colour.blurple())
-            embed.set_author(name=f'Tag: {name}', icon_url=author.avatar_url)
-            embed.add_field(name='Created by', value=str(ctx.message.author))
-            embed.add_field(name='Created on', value=datetime.datetime.fromtimestamp(tag['created']).strftime('%A %d %B %Y at %I:%M %p (UTC)'), inline=False)
-            embed.add_field(name='Character Count', value=f'{utils.punctuate_number(len(tag["content"]))} characters', inline=False)
-            embed.add_field(name='Word Count', value=f'{utils.punctuate_number(len(tag["content"].split(" ")))} words', inline=False)
-
-            await ctx.send(embed=embed)
-
-    @commands.command(brief='Deletes a tag', aliases=['deletetag', 'notag'], usage='[tag name]')
-    async def deltag(self, ctx, *, name):
-        try:
-            tag = await dbcontrol.get_tag(ctx.message.author.id, ctx.guild.id, name)
-            if tag:
-                await dbcontrol.delete_tag(ctx.author.id, ctx.guild.id, name)
-                await ctx.send(f":white_check_mark: **Tag ``{name}`` successfully deleted!**")
-            else:
-              await ctx.send(':x: **Tag ``{}`` could not be found.**'.format(name))
-        except aiosqlite.OperationalError:
-            await ctx.send(':x: **Tag ``{}`` could not be found.**'.format(name))
+        embed = discord.Embed(colour=discord.Colour.blurple())
+        embed.set_author(name=f'Tag: {name}', icon_url=author.avatar_url)
+        embed.add_field(name='Created by', value=str(ctx.message.author))
+        embed.add_field(name='Created on', value=datetime.datetime.fromtimestamp(tag['created']).strftime('%A %d %B %Y at %I:%M %p (UTC)'), inline=False)
+        embed.add_field(name='Character Count', value=f'{utils.punctuate_number(len(tag["content"]))} characters', inline=False)
+        embed.add_field(name='Word Count', value=f'{utils.punctuate_number(len(tag["content"].split(" ")))} words', inline=False)
+        await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Tags(bot))

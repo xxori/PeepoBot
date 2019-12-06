@@ -143,6 +143,12 @@ async def get_tag(author, guild, name):
     return await cursor.fetchone()
     await c.close()
 
+async def get_guild_tag(guild, name):
+    c = await get_connector()
+    cursor = await c.execute(f'SELECT * FROM tags WHERE name = "{name}" AND guild = "{guild}"')
+    return await cursor.fetchone()
+    await c.close()
+
 async def run_command(command):
     c = await get_connector()
     await c.execute(command)
