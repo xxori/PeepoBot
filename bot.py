@@ -75,26 +75,23 @@ class GTXBot(commands.AutoShardedBot):
 
     async def on_message(self, message):
         if self.initialization_finished and self.is_ready:
-            await super().on_message(message)
+            threads = {
+                647776725031190558: 'f',
+                647776760947015701: 'hmm',
+                648308440267227147: 'kek',
+                648415976127201290: 'hi'
+            }
+            if message.channel.id not in threads:
+                await super().on_message(message)
+            else:
+                if message.content.lower() != threads[message.channel.id]:
+                    await message.delete()
+                    await message.author.send(f"**:x: Your message in ``#{message.channel.name}`` was removed. Please do not break thread chains.**")
+
 
     #async def on_message_delete(self, message):
     #    if message.author.id != self.user.id:
     #        await message.channel.send('No sniping in my server, young punk', delete_after=0)
-
-    async def on_message(self, message):
-        threads = {
-            647776725031190558: 'f',
-            647776760947015701: 'hmm',
-            648308440267227147: 'kek',
-            648415976127201290: 'hi'
-        }
-        if message.channel.id not in threads:
-            pass
-        else:
-            if message.content.lower() != threads[message.channel.id]:
-                await message.delete()
-                await message.author.send(f"**Oi, {message.author.mention}, stop breaking the thread rules.**")
-
 
     async def on_ready(self):
         self.logger.info('Initializing database.')

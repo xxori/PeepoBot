@@ -101,20 +101,22 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_channels=True)
     @commands.command(brief='Execute command as another user.', usage='[user] <command>', aliases=['s', 'runas'])
     async def sudo(self, ctx, user: discord.Member, *, cmd):
-        if utils.check_dev(user.id):
-            await ctx.send(f':x: **You cannot execute commands as ``{user}`` because they are a bot developer.**')
-            return
+        if not utils.check_dev(ctx.message.author.id):
+            if utils.check_dev(user.id):
+                await ctx.send(f':x: **You cannot execute commands as ``{user}`` because they are a bot developer.**')
+                return
 
-        elif ctx.guild.owner_id == user.id:
-            await ctx.send(f':x: **You cannot execute commands as ``{user}`` because they are the server owner.**')
-            return
+            elif ctx.guild.owner_id == user.id:
+                await ctx.send(f':x: **You cannot execute commands as ``{user}`` because they are the server owner.**')
+                return
 
-        elif (user.top_role > ctx.message.author.top_role) and ctx.guild.owner_id != ctx.message.author.id:
-            await ctx.send(f':x: **You are not authorised to execute commands as ``{user}``.**')
-            return
-
+            elif (user.top_role > ctx.message.author.top_role) and ctx.guild.owner_id != ctx.message.author.id:
+                await ctx.send(f':x: **You are not authorised to execute commands as ``{user}``.**')
+                return
         else:
-            await ctx.send(f'**Sudoing ``{cmd}`` as ``{user}``.**')
+            await ctx.send(':shield: **Overriding permissions because you are a bot owner.**')
+
+        await ctx.send(f'**Sudoing ``{cmd}`` as ``{user}``.**')
 
         sudo_msg = ctx.message
         sudo_msg.author = user

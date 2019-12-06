@@ -45,7 +45,7 @@ class HelpCommand(commands.HelpCommand):
         text += '\n'
 
         await self.get_destination().send(f"{self.context.author.mention} :point_right: **Check your DM's!**")
-        for idx, chunk in enumerate(self.divide(text.splitlines(), 64)):
+        for idx, chunk in enumerate(self.divide(text.splitlines(), 96)):
             doc = '\n```asciidoc\n'+'\n'.join(chunk).strip('```') + '```'
             if idx == 0:
                 doc = '``Bot Commands``' + doc
