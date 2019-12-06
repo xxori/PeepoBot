@@ -41,7 +41,7 @@ class Tags(commands.Cog):
         elif tag['author'] != ctx.message.author.id and not ctx.message.author.guild_permissions.manage_messages:
             await ctx.send(':x: **You do not own tag ``{}``.**'.format(name))
             return
-        await dbcontrol.delete_tag(ctx.author.id, ctx.guild.id, name)
+        await dbcontrol.delete_tag(tag['author'], ctx.guild.id, name)
         await ctx.send(f":recycle: **Tag ``{name}`` deleted successfully.**")
 
     @tag.command()
@@ -54,7 +54,7 @@ class Tags(commands.Cog):
 
         embed = discord.Embed(colour=discord.Colour.blurple())
         embed.set_author(name=f'Tag: {name}', icon_url=author.avatar_url)
-        embed.add_field(name='Created by', value=str(ctx.message.author))
+        embed.add_field(name='Created by', value=str(author))
         embed.add_field(name='Created on', value=datetime.datetime.fromtimestamp(tag['created']).strftime('%A %d %B %Y at %I:%M %p (UTC)'), inline=False)
         embed.add_field(name='Character Count', value=f'{utils.punctuate_number(len(tag["content"]))} characters', inline=False)
         embed.add_field(name='Word Count', value=f'{utils.punctuate_number(len(tag["content"].split(" ")))} words', inline=False)

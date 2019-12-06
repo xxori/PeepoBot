@@ -69,6 +69,9 @@ class GTXBot(commands.AutoShardedBot):
 
         runtime = datetime.datetime.utcnow() - self.run_time
         self.logger.info(f'Running duration: {utils.strfdelta(runtime, "%Dd %Hh %Mm %Ss")}')
+        self.logger.info('Closing cleverbot session...')
+        asyncio.get_event_loop().run_until_complete(self.cb.close())
+
         self.logger.info('Bot has shut down successfully.')
 
     # events
@@ -101,8 +104,13 @@ class GTXBot(commands.AutoShardedBot):
         self.connect_time = datetime.datetime.utcnow()
         self.logger.info(f'Connection time reset. ({old_time or "n/a"} -> {self.connect_time})')
         self.logger.info(f'Client ready: {self.user} ({self.user.id})')
-        self.loop.create_task(self.presence_changer())
+
+        self.logger.info('Starting cleverbot session...')
+        self.cb = utils.CleverBot()
+        await self.cb.init()
+
         self.logger.info(f'Started presence loop.')
+        self.loop.create_task(self.presence_changer())
 
         self.logger.info('Marking initialization_finished.')
         self.initialization_finished = True

@@ -4,6 +4,8 @@ from discord.ext import commands
 import dbcontrol
 from pytz import timezone
 import aiosqlite
+import random
+
 
 class Fun(commands.Cog):
     def __init__(self, bot):
@@ -38,6 +40,19 @@ class Fun(commands.Cog):
         embed = discord.Embed(title=data['title'])
         embed.set_image(url=data['url'])
         await ctx.send(embed=embed)
+
+    @commands.command(brief='Ping a random person', aliases=['rping'])
+    @commands.has_permissions(mention_everyone=True)
+    async def randomping(self, ctx):
+        await ctx.send(random.choice(ctx.guild.members).mention)
+
+    @commands.command(brief='Talk to cleverbot', aliases=['cbot'], usage='<sentence>')
+    async def cleverbot(self, ctx, *, sentence):
+        async with ctx.typing():
+            response = await self.bot.cb.getResponse(sentence)
+            if response.strip() == '':
+                response = '``(no reply)``'
+            await ctx.send(response)
 
 def setup(bot):
     bot.add_cog(Fun(bot))
