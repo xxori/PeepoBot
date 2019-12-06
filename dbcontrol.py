@@ -19,7 +19,7 @@ async def get_connector():
 async def initialize_tables(bot):
     c = await get_connector()
     await c.execute('CREATE TABLE IF NOT EXISTS users(id INTEGER, seen_in TEXT, level INTEGER, exp INTEGER, exp_required INTEGER, settings TEXT, bio TEXT, image_url TEXT)')
-    await c.execute('CREATE TABLE IF NOT EXISTS tags(author INTEGER, created REAL, name TEXT, content TEXT)')
+    await c.execute('CREATE TABLE IF NOT EXISTS tags(author INTEGER, guild INTEGER, created REAL, name TEXT, content TEXT)')
     await c.execute('CREATE TABLE IF NOT EXISTS guilds(id INTEGER, prefix TEXT, logchannel INTEGER, muterole INTEGER, announcechannel INTEGER)')
 
     bot.logger.info('Rebuilding guild database.')
@@ -131,15 +131,15 @@ async def get_user(id):
     return await cursor.fetchone()
     await c.close()
 
-async def add_tag(author, name, content):
+async def add_tag(author, guild, name, content):
     c = await get_connector()
-    await c.execute(f'INSERT INTO tags VALUES (?, ?, ?, ?)', (author.id, datetime.utcnow().timestamp(), name, content))
+    await c.execute(f'INSERT INTO tags VALUES (?, ?, ?, ?, ?)', (author.id, guild.id, datetime.utcnow().timestamp(), name, content))
     await c.commit()
     await c.close()
 
-async def get_tag(author, name):
+async def get_tag(author, guild, name):
     c = await get_connector()
-    cursor = await c.execute(f'SELECT * FROM tags WHERE name = "{name}" AND author = "{author}"')
+    cursor = await c.execute(f'SELECT * FROM tags WHERE name = "{name}" AND author = "{author}" AND guild = "{guild}"')
     return await cursor.fetchone()
     await c.close()
 
@@ -149,8 +149,8 @@ async def run_command(command):
     await c.commit()
     await c.close()
 
-async def delete_tag(author, name):
+async def delete_tag(author, guild, name):
     c = await get_connector()
-    await c.execute(f'DELETE FROM tags WHERE author = "{author}" AND name = "{name}"')
+    await c.execute(f'DELETE FROM tags WHERE author = "{author}" AND name = "{name}" AND guild = "{guild}"')
     await c.commit()
     await c.close()
