@@ -18,7 +18,7 @@ async def get_connector():
 
 async def initialize_tables(bot):
     c = await get_connector()
-    await c.execute('CREATE TABLE IF NOT EXISTS users(id INTEGER, seen_in TEXT, level INTEGER, exp INTEGER, exp_required INTEGER, settings TEXT, bio TEXT, image_url TEXT)')
+    await c.execute('CREATE TABLE IF NOT EXISTS users(id INTEGER, seen_in TEXT, level INTEGER, exp INTEGER, exp_required INTEGER, settings TEXT, bio TEXT, image_url TEXT, profile_color INTEGER)')
     await c.execute('CREATE TABLE IF NOT EXISTS tags(author INTEGER, guild INTEGER, created REAL, name TEXT, content TEXT)')
     await c.execute('CREATE TABLE IF NOT EXISTS guilds(id INTEGER, prefix TEXT, logchannel INTEGER, muterole INTEGER, announcechannel INTEGER)')
 
@@ -159,4 +159,10 @@ async def delete_tag(author, guild, name):
     c = await get_connector()
     await c.execute(f'DELETE FROM tags WHERE author = "{author}" AND name = "{name}" AND guild = "{guild}"')
     await c.commit()
+    await c.close()
+
+async def get_all_tags(author, guild):
+    c = await get_connector()
+    cursor = await c.execute(f'SELECT * FROM tags WHERE author = "{author}" AND guild = "{guild}"')
+    return await cursor.fetchall()
     await c.close()

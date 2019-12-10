@@ -134,6 +134,20 @@ class Utility(commands.Cog):
         embed.description = desc
         await msg.edit(content=f'', embed=embed)
 
+    @commands.command()
+    async def snipe(self, ctx):
+        snipes = self.bot.snipe_list
+        now = datetime.datetime.utcnow()
+        snipes_serv = []
+
+        for msg in snipes:
+            if msg.guild == ctx.message.guild:
+                snipes_serv.append(msg)
+
+        embed = discord.Embed(title=f"Deleted messages from {ctx.message.guild.name}")
+        for msg in snipes_serv:
+            embed.add_field(name=f"{msg.author}", value=msg.content, inline=False)
+        await ctx.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Utility(bot))
