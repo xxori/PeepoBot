@@ -12,6 +12,7 @@ import time
 import sys
 import os
 
+
 class GTXBot(commands.AutoShardedBot):
     def __init__(self, logger, config):
         super(GTXBot, self).__init__(command_prefix=commands.when_mentioned_or('$'))
@@ -26,7 +27,7 @@ class GTXBot(commands.AutoShardedBot):
         self.presence_looping = True
 
         self.module_directories = ['extensions']
-
+        self.snipe_list = []
         # USE THIS INSTEAD OF IS_READY!!!!!!!!! DATABASE ISSUES
         self.initialization_finished = False
 
@@ -91,6 +92,8 @@ class GTXBot(commands.AutoShardedBot):
                     await message.delete()
                     await message.author.send(f"**:x: Your message in ``#{message.channel.name}`` was removed. Please do not break thread chains.**")
 
+    async def on_message_delete(self, message):
+        self.snipe_list.append(message)
 
     #async def on_message_delete(self, message):
     #    if message.author.id != self.user.id:
