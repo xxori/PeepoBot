@@ -11,7 +11,7 @@ import json
 import time
 import sys
 import os
-
+import aiohttp
 
 class GTXBot(commands.AutoShardedBot):
     def __init__(self, logger, config):
@@ -25,7 +25,6 @@ class GTXBot(commands.AutoShardedBot):
         self.connect_time = None
         self.presences = []
         self.presence_looping = True
-
         self.module_directories = ['extensions']
         self.snipe_list = []
         # USE THIS INSTEAD OF IS_READY!!!!!!!!! DATABASE ISSUES
@@ -70,9 +69,8 @@ class GTXBot(commands.AutoShardedBot):
 
         runtime = datetime.datetime.utcnow() - self.run_time
         self.logger.info(f'Running duration: {utils.strfdelta(runtime, "%Dd %Hh %Mm %Ss")}')
-        self.logger.info('Closing cleverbot session...')
-        asyncio.get_event_loop().run_until_complete(self.cb.close())
-
+        #self.logger.info('Closing cleverbot session...')
+        #asyncio.get_event_loop().run_until_complete(self.cb.close())
         self.logger.info('Bot has shut down successfully.')
 
     # events
@@ -102,9 +100,9 @@ class GTXBot(commands.AutoShardedBot):
         self.logger.info(f'Connection time reset. ({old_time or "n/a"} -> {self.connect_time})')
         self.logger.info(f'Client ready: {self.user} ({self.user.id})')
 
-        self.logger.info('Starting cleverbot session...')
-        self.cb = utils.CleverBot()
-        await self.cb.init()
+        #self.logger.info('Starting cleverbot session...')
+        #self.cb = utils.CleverBot()
+        #await self.cb.init()
 
         self.logger.info(f'Started presence loop.')
         self.loop.create_task(self.presence_changer())

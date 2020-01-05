@@ -81,7 +81,7 @@ def strfdelta(tdelta, fmt):
 	delta['M'], delta["S"] = divmod(remainder, 60)
 	return fmt.replace('%D', str(delta['D'])).replace('%H', str(delta['H'])).replace('%M', str(delta['M'])).replace('%S', str(delta['S']))
 
-
+'''
 class CleverBot:
     browser = None
     page = None
@@ -125,3 +125,4 @@ class CleverBot:
     async def close(self):
         await self.page.close()
         await self.browser.close()
+'''

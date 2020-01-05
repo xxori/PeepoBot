@@ -33,6 +33,7 @@ class Developer(commands.Cog):
         else:
             self.bot.logger.info(
                 f"Bot terminated from dms by {ctx.message.author} ({ctx.message.author.id})")
+        self.bot.logger.info('Bot has shut down successfully.')
         await self.bot.logout()
 
     @commands.check(utils.is_developer)
