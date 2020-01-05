@@ -2,7 +2,6 @@ import aiohttp
 import discord
 from discord.ext import commands
 import dbcontrol
-from pytz import timezone
 import aiosqlite
 import random
 import utils

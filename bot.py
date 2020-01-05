@@ -79,18 +79,12 @@ class GTXBot(commands.AutoShardedBot):
 
     async def on_message(self, message):
         if self.initialization_finished and self.is_ready:
-            threads = {
-                647776725031190558: 'f',
-                647776760947015701: 'hmm',
-                648308440267227147: 'kek',
-                648415976127201290: 'hi'
-            }
-            if message.channel.id not in threads:
-                await super().on_message(message)
-            else:
-                if message.content.lower() != threads[message.channel.id]:
-                    await message.delete()
-                    await message.author.send(f"**:x: Your message in ``#{message.channel.name}`` was removed. Please do not break thread chains.**")
+            ctx = await self.get_context(message)
+            if ctx.valid:
+                if await dbcontrol.is_blacklist(message.author.id):
+                    await message.channel.send(f'Sorry, {message.author}, you are blacklisted and cannot use commands.')
+                    return
+            await super().on_message(message)
 
     async def on_message_delete(self, message):
         self.snipe_list.append(message)

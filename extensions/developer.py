@@ -62,6 +62,26 @@ class Developer(commands.Cog):
         await dbcontrol.run_command(command)
         self.bot.logger.info(f"SQL command ({command}) run by {ctx.message.author} ({ctx.message.author.id})")
 
+    @commands.check(utils.is_developer)
+    @commands.command()
+    async def blacklist(self, ctx, user: discord.User):
+        if user.bot:
+            await ctx.send(':x:**You cannot blacklist a bot**')
+        elif utils.check_dev(user.id):
+            await ctx.send(':x:**You cannot blacklist a developer**')
+        else:
+            await dbcontrol.modify_user(user.id, 'blacklist', 1)
+            await ctx.send(f':white_check_mark:**User {user} has been successfully blacklisted**')
+
+    @commands.check(utils.is_developer)
+    @commands.command()
+    async def unblacklist(self, ctx, user: discord.User):
+        if not dbcontrol.is_blacklist(user.id):
+            await ctx.send(f':x:**User {user} is not currently blacklisted')
+        else:
+            await dbcontrol.modify_user(user.id, 'blacklist', 0)
+            await ctx.send(f':white_check_mark:**User {user} has been successfully unblacklisted**')
+
 
 def setup(bot):
     bot.add_cog(Developer(bot))

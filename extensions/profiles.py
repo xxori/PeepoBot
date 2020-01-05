@@ -7,7 +7,6 @@ import aiohttp
 import random
 import utils
 import time
-from colour import Color
 
 class Profiles(commands.Cog):
     def __init__(self, bot):
