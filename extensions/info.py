@@ -93,14 +93,14 @@ class Utility(commands.Cog):
         await msg.edit(embed=embed)
 
         if random.randint(1,2) == 1:
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession(loop=self.bot.loop) as session:
                 response = await session.get(url='https://uselessfacts.jsph.pl/random.json?language=en')
                 fact = await response.json()
                 await session.close()
             value = fact['text']
             embed.add_field(name='Fact of the Day', value=value, inline=False)
         else:
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession(loop=self.bot.loop) as session:
                 response = await session.get(url='https://sv443.net/jokeapi/category/Any?blacklistFlags=nsfw')
                 data = await response.json()
                 await session.close()
