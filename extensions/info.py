@@ -145,9 +145,12 @@ class Utility(commands.Cog):
                 snipes_serv.append(msg)
 
         embed = discord.Embed(title=f"Deleted messages from {ctx.message.guild.name}")
-        for msg in snipes_serv:
-            embed.add_field(name=f"{msg.author}", value=msg.content, inline=False)
-        await ctx.send(embed=embed)
+        if len(snipes_serv):
+            for msg in snipes_serv:
+                embed.add_field(name=f"{msg.author}", value=msg.content, inline=False)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(':x:**There were no messages to snipe**')
 
 def setup(bot):
     bot.add_cog(Utility(bot))

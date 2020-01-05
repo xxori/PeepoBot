@@ -2,7 +2,6 @@ import aiosqlite
 import json
 from discord.ext import commands
 import discord
-from pytz import timezone
 from datetime import datetime
 
 def dict_factory(cursor, row):
@@ -18,7 +17,7 @@ async def get_connector():
 
 async def initialize_tables(bot):
     c = await get_connector()
-    await c.execute('CREATE TABLE IF NOT EXISTS users(id INTEGER, seen_in TEXT, level INTEGER, exp INTEGER, exp_required INTEGER, settings TEXT, bio TEXT, image_url TEXT, profile_color INTEGER)')
+    await c.execute('CREATE TABLE IF NOT EXISTS users(id INTEGER, seen_in TEXT, level INTEGER, exp INTEGER, exp_required INTEGER, settings TEXT, bio TEXT, image_url TEXT, profile_color INTEGER, blacklist INTEGER)')
     await c.execute('CREATE TABLE IF NOT EXISTS tags(author INTEGER, guild INTEGER, created REAL, name TEXT, content TEXT)')
     await c.execute('CREATE TABLE IF NOT EXISTS guilds(id INTEGER, prefix TEXT, logchannel INTEGER, muterole INTEGER, announcechannel INTEGER)')
 
@@ -109,7 +108,7 @@ async def add_user(id, bot):
 
     if not data:
         settings = json.dumps(settings_template).replace("'", "''")
-        await c.execute(f"INSERT INTO users VALUES ({id}, '{[i.id for i in guilds]}', 1, 0, 100, '{settings}', '', '')")
+        await c.execute(f"INSERT INTO users VALUES ({id}, '{[i.id for i in guilds]}', 1, 0, 100, '{settings}', '', '', '', '', 0)")
     else:
         await c.execute(f'UPDATE users SET seen_in = "{[i.id for i in guilds]}" WHERE id = {id}')
     await c.commit()
@@ -128,8 +127,9 @@ async def modify_user(id, parameter, value):
 async def get_user(id):
     c = await get_connector()
     cursor = await c.execute(f'SELECT * FROM users WHERE id = {id}')
-    return await cursor.fetchone()
+    data = await cursor.fetchone()
     await c.close()
+    return data
 
 async def add_tag(author, guild, name, content):
     c = await get_connector()
@@ -140,14 +140,16 @@ async def add_tag(author, guild, name, content):
 async def get_tag(author, guild, name):
     c = await get_connector()
     cursor = await c.execute(f'SELECT * FROM tags WHERE name = "{name}" AND author = "{author}" AND guild = "{guild}"')
-    return await cursor.fetchone()
+    data = await cursor.fetchone()
     await c.close()
+    return data
 
 async def get_guild_tag(guild, name):
     c = await get_connector()
     cursor = await c.execute(f'SELECT * FROM tags WHERE name = "{name}" AND guild = "{guild}"')
-    return await cursor.fetchone()
+    data = await cursor.fetchone()
     await c.close()
+    return data
 
 async def run_command(command):
     c = await get_connector()
@@ -164,5 +166,17 @@ async def delete_tag(author, guild, name):
 async def get_all_tags(author, guild):
     c = await get_connector()
     cursor = await c.execute(f'SELECT * FROM tags WHERE author = "{author}" AND guild = "{guild}"')
-    return await cursor.fetchall()
+    data = await cursor.fetchall()
     await c.close()
+    return data
+
+async def is_blacklist(id):
+    c = await get_connector()
+    cursor = await c.execute(f'SELECT * FROM users WHERE id = {id}')
+    data = await cursor.fetchone()
+    if data['blacklist'] == 1:
+        bl = True
+    else:
+        bl = False
+    await c.close()
+    return bl
