@@ -6,7 +6,8 @@ import aiohttp
 import random
 import utils
 import time
-
+from mcstatus import MinecraftServer
+import re
 
 class Utility(commands.Cog):
     def __init__(self, bot):
@@ -134,7 +135,7 @@ class Utility(commands.Cog):
         embed.description = desc
         await msg.edit(content=f'', embed=embed)
 
-    @commands.command()
+    @commands.command(brief='Shows recently deleted messages')
     async def snipe(self, ctx):
         snipes = self.bot.snipe_list
         now = datetime.datetime.utcnow()
@@ -151,6 +152,34 @@ class Utility(commands.Cog):
             await ctx.send(embed=embed)
         else:
             await ctx.send(':x:**There were no messages to snipe**')
+
+    @commands.command(aliases=['mc', 'mcserv'], brief='Provides info on a minecraft server', usage='[server ip]')
+    async def minecraft(self, ctx, serverip='gsc.epicgamer.org:25622'):
+        try:
+            async with ctx.typing():
+                serv = MinecraftServer.lookup(str(serverip))
+                status = serv.status().raw
+                latency = serv.ping()
+        except Exception:
+            await ctx.send('**Request failed, the server could not exist or be down**')
+            return
+        desc = status['description']['text']
+        descnew = re.sub('§.', '', desc)
+        if status['players']['online'] > 20:
+            players = 'Many'
+        else:
+            players = []
+            for i in status['players']['sample']:
+                players.append(i['name'])
+            players = ', '.join(players)
+        embed = discord.Embed(title=serverip, color=discord.Color.blurple())
+        embed.add_field(name='Description', value=descnew, inline=False)
+        embed.add_field(name='Ping', value=f'{latency}ms', inline=False)
+        embed.add_field(name='Version', value=status['version']['name'], inline=False)
+        embed.add_field(name=f"Players ({status['players']['online']}/{status['players']['max']})",
+                       value=None if status['players']['online'] == 0 else players)
+        await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Utility(bot))
