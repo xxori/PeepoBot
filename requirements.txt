@@ -1,0 +1,10 @@
+discord.py
+youtube_dl
+aiohttp
+asyncio
+bs4
+datetime
+aiosqlite
+PyNaCl
+dnspython
+async-timeout

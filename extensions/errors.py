@@ -61,6 +61,7 @@ class ErrorHandler(commands.Cog):
         elif isinstance(e, commands.ExtensionNotLoaded):
             await ctx.send(f':x: Extension ``{e.args[0]}`` is not loaded.')
 
+
         else:
             await ctx.send(f':x: **An internal error has occurred.** ```py\n{type(e)}: {e}```')
             traceback.print_exception(type(e), e, e.__traceback__)
