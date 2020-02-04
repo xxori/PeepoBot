@@ -99,7 +99,7 @@ class Moderation(commands.Cog):
             await ctx.send(f':x: **``{target}`` is not muted.**')
 
     @commands.has_permissions(manage_channels=True)
-    @commands.command(brief='Execute command as another user.', usage='[user] <command>', aliases=['s', 'runas', 'please'])
+    @commands.command(brief='Execute command as another user.', usage='[user] <command>', aliases=['runas', 'please'])
     async def sudo(self, ctx, user: discord.Member, *, cmd):
         if not utils.check_dev(ctx.message.author.id):
             if utils.check_dev(user.id):

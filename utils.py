@@ -3,7 +3,7 @@ from discord.ext import commands
 import aiohttp
 
 import asyncio
-import pyppeteer as pyp
+#import pyppeteer as pyp
 from bs4 import BeautifulSoup
 
 import re
@@ -126,3 +126,20 @@ class CleverBot:
         await self.page.close()
         await self.browser.close()
 '''
+
+#Checks if music is currently playing
+async def audio_playing(ctx):
+    client = ctx.guild.voice_client
+    if client and client.channel and client.source:
+        return True
+    else:
+        return False
+
+#Checks if bot is in same vc as command sender
+async def in_voice_channel(ctx):
+    voice = ctx.author.voice
+    bot_voice = ctx.guild.voice_client
+    if voice and bot_voice and voice.channel and bot_voice.channel and voice.channel == bot_voice.channel:
+        return True
+    else:
+        return False
