@@ -6,7 +6,7 @@ import aiohttp
 import random
 import utils
 import time
-from mcstatus import MinecraftServer
+#from mcstatus import MinecraftServer
 import re
 
 class Utility(commands.Cog):
@@ -50,11 +50,10 @@ class Utility(commands.Cog):
         embed.add_field(name='Joined Server', value=user.joined_at.strftime('%A %d %B %Y at %I:%M %p (UTC)'), inline=False)
         embed.add_field(name='Account Created', value=user.created_at.strftime('%A %d %B %Y at %I:%M %p (UTC)'), inline=False)
         embed.set_thumbnail(url=user.avatar_url)
-        embed.add_field(name='Nickname: ', value=user.nick, inline=False)
-        if user.activity:
+        if user.nick != None:
+            embed.add_field(name='Nickname: ', value=user.nick, inline=False)
+        if user.activity != None:
             embed.add_field(name='Current Activity: ', value=user.activity.name, inline=False)
-        else:
-            embed.add_field(name='Current Activity: ', value=user.activity, inline=False)
         await ctx.send(embed=embed)
 
     @commands.command(
@@ -112,7 +111,7 @@ class Utility(commands.Cog):
             embed.add_field(name='Joke of the Day', value=value, inline=False)
         await msg.edit(embed=embed)
 
-
+    """
     @commands.command(brief='Find an active channel', description='List all channels and sort by most recent activity.')
     async def active(self, ctx):
         now = datetime.datetime.utcnow()
@@ -134,7 +133,7 @@ class Utility(commands.Cog):
                 desc += f'**<#{channel_id}> was active ``{time_str}`` ago.**\n\n'
         embed.description = desc
         await msg.edit(content=f'', embed=embed)
-
+    """
     @commands.command(brief='Shows recently deleted messages')
     async def snipe(self, ctx):
         snipes = self.bot.snipe_list
@@ -153,6 +152,7 @@ class Utility(commands.Cog):
         else:
             await ctx.send(':x:**There were no messages to snipe**')
 
+"""
     @commands.command(aliases=['mc', 'mcserv'], brief='Provides info on a minecraft server', usage='[server ip]')
     async def minecraft(self, ctx, serverip='gsc.epicgamer.org:25622'):
         try:
@@ -179,7 +179,7 @@ class Utility(commands.Cog):
         embed.add_field(name=f"Players ({status['players']['online']}/{status['players']['max']})",
                        value=None if status['players']['online'] == 0 else players)
         await ctx.send(embed=embed)
-
+"""
 
 def setup(bot):
     bot.add_cog(Utility(bot))

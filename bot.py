@@ -79,6 +79,9 @@ class GTXBot(commands.AutoShardedBot):
         if self.initialization_finished and self.is_ready:
             ctx = await self.get_context(message)
             if ctx.valid:
+                if ctx.guild == None:
+                    await ctx.send(":x:**Commands may not function correctly in dms**")
+                    return
                 if await dbcontrol.is_blacklist(message.author.id):
                     await message.channel.send(f'Sorry, {message.author}, you are blacklisted and cannot use commands.')
                     return
