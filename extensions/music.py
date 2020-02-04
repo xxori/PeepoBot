@@ -55,7 +55,6 @@ class GuildState:
     def __init__(self):
         self.volume = 1.0
         self.playlist = []
-        self.skip_votes = set()
         self.now_playing = None
 
     def is_requester(self, user):
@@ -126,14 +125,14 @@ class Music(commands.Cog):
     @commands.check(utils.audio_playing)
     @commands.check(utils.in_voice_channel)
     async def skip(self, ctx):
+        await ctx.message.add_reaction("✅")
         state = self.get_state(ctx.guild)
         client = ctx.guild.voice_client
         client.stop()
 
     def _play_song(self, client, state, song):
         state.now_playing = song
-        source = discord.PCMVolumeTransformer(
-            discord.FFmpegPCMAudio(song.stream_url), volume=state.volume)
+        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(song.stream_url), volume=state.volume)
 
         def after_playing(err):
             if len(state.playlist) > 0:
@@ -238,8 +237,8 @@ class Music(commands.Cog):
                 permissions = message.channel.permissions_for(user)
                 guild = message.guild
                 state = self.get_state(guild)
+                client = message.guild.voice_client
                 if permissions.administrator or (user_in_channel and state.is_requester(user)):
-                    client = message.guild.voice_client
                     if reaction.emoji == "⏯":
                         self._pause_audio(client)
                     elif reaction.emoji == "⏭":
@@ -250,7 +249,6 @@ class Music(commands.Cog):
                         )  # insert current song at beginning of playlist
                         client.stop()
                 elif reaction.emoji == "⏭"and user_in_channel and message.guild.voice_client and message.guild.voice_client.channel:
-                    voice_channel = message.guild.voice_client.channel
                     client.stop()
 
     async def _add_reaction_controls(self, message):

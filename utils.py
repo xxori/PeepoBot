@@ -76,10 +76,10 @@ class HierarchyPermissionError(commands.CommandError):
 
 # copied over from bartender
 def strfdelta(tdelta, fmt):
-	delta = {"D": tdelta.days}
-	delta['H'], remainder = divmod(tdelta.seconds, 3600)
-	delta['M'], delta["S"] = divmod(remainder, 60)
-	return fmt.replace('%D', str(delta['D'])).replace('%H', str(delta['H'])).replace('%M', str(delta['M'])).replace('%S', str(delta['S']))
+    delta = {"D": tdelta.days}
+    delta['H'], remainder = divmod(tdelta.seconds, 3600)
+    delta['M'], delta["S"] = divmod(remainder, 60)
+    return fmt.replace('%D', str(delta['D'])).replace('%H', str(delta['H'])).replace('%M', str(delta['M'])).replace('%S', str(delta['S']))
 
 '''
 class CleverBot:
@@ -127,19 +127,23 @@ class CleverBot:
         await self.browser.close()
 '''
 
-#Checks if music is currently playing
+
+# Checks if music is currently playing
 async def audio_playing(ctx):
     client = ctx.guild.voice_client
     if client and client.channel and client.source:
         return True
     else:
+        await ctx.send("**:x:I'm not currently playing audio**")
         return False
 
-#Checks if bot is in same vc as command sender
+
+# Checks if bot is in same vc as command sender
 async def in_voice_channel(ctx):
     voice = ctx.author.voice
     bot_voice = ctx.guild.voice_client
     if voice and bot_voice and voice.channel and bot_voice.channel and voice.channel == bot_voice.channel:
         return True
     else:
+        await ctx.send("**:x:You need to be in the same voice channel as the bot to run this command**")
         return False
