@@ -42,11 +42,11 @@ async def rebuild_guilds(bot):
     c = await get_connector()
 
     for guild in bot.guilds:
-        cursor = await c.execute(f'SELECT * FROM guilds WHERE id = {guild.id}')
+        cursor = await c.execute(f'SELECT * FROM guilds WHERE id = ?', guild.id)
         data = await cursor.fetchone()
 
         if not data:
-            await c.execute(f'INSERT INTO guilds VALUES ({guild.id}, "$", "", "", "")')
+            await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', guild.id, '$', '', '', '')
 
     await c.commit()
     await c.close()
@@ -60,7 +60,7 @@ async def add_guild(bot, id):
         if 'announcements' in channel.name.strip():
             announcements_channel = channel.id
 
-    await c.execute(f'INSERT INTO guilds VALUES ({id}, "$", -1, -1, {announcements_channel})')
+    await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', id, '$', -1. -1, announcements_channel)
 
     for member in guild.members:
         add_user(member.id, bot)
@@ -73,7 +73,7 @@ async def add_guild(bot, id):
 
 async def get_guild(id):
     c = await get_connector()
-    cursor = await c.execute(f'SELECT * FROM guilds WHERE id = {guild.id}')
+    cursor = await c.execute(f'SELECT * FROM guilds WHERE id = ?', guild.id)
     data = await cursor.fetchone()
     await c.close()
     return data
@@ -81,10 +81,7 @@ async def get_guild(id):
 async def modify_guild(id, parameter, value):
     c = await get_connector()
 
-    if isinstance(value, str):
-        value = f'"{value}"'
-
-    await c.execute(f'UPDATE guilds SET {parameter} = {value} WHERE id = {id}')
+    await c.execute(f'UPDATE guilds SET ? = ? WHERE id = ?', parameter, value, id)
     await c.commit()
     await c.close()
 
@@ -101,26 +98,23 @@ async def add_user(id, bot):
     if user is None:
         return False
 
-    cursor = await c.execute(f'SELECT * FROM users WHERE id = {id}')
+    cursor = await c.execute(f'SELECT * FROM users WHERE id = ?', id)
     data = await cursor.fetchone()
 
     guilds = [guild for guild in bot.guilds if user in guild.members]
 
     if not data:
         settings = json.dumps(settings_template).replace("'", "''")
-        await c.execute(f"INSERT INTO users VALUES ({id}, '{[i.id for i in guilds]}', 1, 0, 100, '{settings}', '', '', '', '', 0)")
+        await c.execute(f"INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", id, str([i.id for i in guilds]), 1, 0, 100, str(settings), '', '', '', '', 0)
     else:
-        await c.execute(f'UPDATE users SET seen_in = "{[i.id for i in guilds]}" WHERE id = {id}')
+        await c.execute(f'UPDATE users SET seen_in = ? WHERE id = ?', str([i.id for i in guilds]), id)
     await c.commit()
     await c.close()
 
 async def modify_user(id, parameter, value):
     c = await get_connector()
 
-    if isinstance(value, str):
-        value = f'"{value}"'
-
-    await c.execute(f'UPDATE users SET {parameter} = {value} WHERE id = {id}')
+    await c.execute(f'UPDATE users SET ? = ? WHERE id = ?', parameter, value, id)
     await c.commit()
     await c.close()
 
@@ -139,14 +133,14 @@ async def add_tag(author, guild, name, content):
 
 async def get_tag(author, guild, name):
     c = await get_connector()
-    cursor = await c.execute(f'SELECT * FROM tags WHERE name = "{name}" AND author = "{author}" AND guild = "{guild}"')
+    cursor = await c.execute(f'SELECT * FROM tags WHERE name = ? AND author = ? AND guild = ?', name, author, guild)
     data = await cursor.fetchone()
     await c.close()
     return data
 
 async def get_guild_tag(guild, name):
     c = await get_connector()
-    cursor = await c.execute(f'SELECT * FROM tags WHERE name = "{name}" AND guild = "{guild}"')
+    cursor = await c.execute(f'SELECT * FROM tags WHERE name = ? AND guild = ?', name, guild)
     data = await cursor.fetchone()
     await c.close()
     return data
@@ -159,20 +153,20 @@ async def run_command(command):
 
 async def delete_tag(author, guild, name):
     c = await get_connector()
-    await c.execute(f'DELETE FROM tags WHERE author = "{author}" AND name = "{name}" AND guild = "{guild}"')
+    await c.execute(f'DELETE FROM tags WHERE author = ? AND name = ? AND guild = ?', author, name, guild)
     await c.commit()
     await c.close()
 
 async def get_all_tags(author, guild):
     c = await get_connector()
-    cursor = await c.execute(f'SELECT * FROM tags WHERE author = "{author}" AND guild = "{guild}"')
+    cursor = await c.execute(f'SELECT * FROM tags WHERE author = ? AND guild = ?', author, guild)
     data = await cursor.fetchall()
     await c.close()
     return data
 
 async def is_blacklist(id):
     c = await get_connector()
-    cursor = await c.execute(f'SELECT * FROM users WHERE id = {id}')
+    cursor = await c.execute(f'SELECT * FROM users WHERE id = ?', id)
     data = await cursor.fetchone()
     if data['blacklist'] == 1:
         bl = True
