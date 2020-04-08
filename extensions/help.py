@@ -10,6 +10,7 @@ class HelpCommand(commands.HelpCommand):
         self.command_attrs['brief'] = 'Help for bot commands.'
         self.command_attrs['description'] = 'Displays a list of all bot commands and their usages.'
         self.command_attrs['usage'] = '[command]'
+        self.command_attrs['cog'] = 'info'
 
     def divide(self, l, size):
         for i in range(0, len(l), size):

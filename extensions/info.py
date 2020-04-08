@@ -6,7 +6,6 @@ import aiohttp
 import random
 import utils
 import time
-#from mcstatus import MinecraftServer
 import re
 
 class Utility(commands.Cog):
