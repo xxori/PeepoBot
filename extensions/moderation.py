@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import utils
+import dbcontrol
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
@@ -15,7 +16,7 @@ class Moderation(commands.Cog):
     @commands.command(brief='Permanently ban a user from the server', usage='[user] <reason>')
     async def ban(self, ctx, target: discord.Member, *, reason=None):
         if ctx.guild.owner_id == target.id:
-            await ctx.send(f':x: **You cannot kick ``{target}`` because they are the server owner.**')
+            await ctx.send(f':x: **You cannot ban ``{target}`` because they are the server owner.**')
             return
 
         elif (target.top_role >= ctx.message.author.top_role) and ctx.guild.owner_id != ctx.message.author.id:
@@ -59,12 +60,17 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     @commands.command(brief='Mutes a server member', usage='[user] <reason>')
     async def mute(self, ctx, target: discord.Member, *, reason=None):
-        muted = discord.utils.get(ctx.guild.roles, name='Muted')
-        if muted is None:
-            await ctx.send(':x: **A role called ``Muted`` is required for this command to run. Please create it before proceeding.**')
+        muteRole = (await dbcontrol.get_guild(ctx.guild))['muterole']
+        if muteRole is None:
+            await ctx.send(f':x: **A muterole is required for this command to run. Please assign a muterole with {self.bot.prefix}muterole**')
             return
 
-        elif muted > ctx.guild.me.top_role:
+        muted = ctx.guild.get_role(muteRole)
+        if muted is None:
+            await ctx.send(f":x: **The muterole does not exist anymore. Assign a new one with {self.bot.preifx}muterole.**")
+            return
+
+        if muted > ctx.guild.me.top_role:
             await ctx.send(':x: **I am not allowed to assign the ``Muted`` role. Please lower it below mine.**')
             return
 
@@ -77,7 +83,7 @@ class Moderation(commands.Cog):
             return
 
         elif target.top_role > muted:
-            await ctx.send(f':x: **``{target}`` has the role ``{target.top_role.name}`` which overrides permissions of the ``Muted`` role.**')
+            await ctx.send(f':x: **``{target}`` has the role ``{target.top_role.name}`` which overrides permissions of the muterole**')
 
         else:
             await target.add_roles(muted, reason=f'{ctx.author}: {reason or "unspecified reason"}')
@@ -87,9 +93,14 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     @commands.command(brief='Unmutes a server member', usage='[user]', aliases=['umute'])
     async def unmute(self, ctx, target: discord.Member):
-        muted = discord.utils.get(ctx.guild.roles, name='Muted')
+        muteID = (await dbcontrol.get_guild(ctx.guild))['muterole']
+        if muteID is None:
+            await ctx.send(f":x: **There is no muterole. Assign one with {self.bot.prefix}muterole**")
+
+
+        muted = ctx.guild.get_role(muteID)
         if muted is None:
-            await ctx.send(':x: **A role called ``Muted`` is required for this command to run. Please create it before proceeding.**')
+            await ctx.send(f":x: **The muterole does not exist anymore. Assign a new one with {self.bot.preifx}muterole.**")
             return
 
         if muted in target.roles:
@@ -97,6 +108,19 @@ class Moderation(commands.Cog):
             await ctx.send(f':thumbsup: **Unmuted ``{target}``**')
         else:
             await ctx.send(f':x: **``{target}`` is not muted.**')
+
+    @commands.bot_has_permissions(manage_roles=True)
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(brief="Assigns a muterole for the mute and unmute commands", usage="[role]")
+    async def muterole(self, ctx, role: discord.Role):
+        #if ctx.guild.get_role(role) is None:
+        #    await ctx.send(":x: **Role not found**")
+        #    return
+        await dbcontrol.modify_guild(ctx.guild.id, "muterole", role.id)
+        await ctx.send("The muterole has been set to " + role.mention)
+
+
+
 
     @commands.has_permissions(manage_channels=True)
     @commands.command(brief='Execute command as another user.', usage='[user] <command>', aliases=['runas', 'please'])

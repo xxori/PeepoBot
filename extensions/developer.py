@@ -77,7 +77,7 @@ class Developer(commands.Cog):
     @commands.check(utils.is_developer)
     @commands.command()
     async def unblacklist(self, ctx, user: discord.User):
-        if not dbcontrol.is_blacklist(user.id):
+        if not await dbcontrol.is_blacklist(user.id):
             await ctx.send(f':x:**User {user} is not currently blacklisted')
         else:
             await dbcontrol.modify_user(user.id, 'blacklist', 0)
