@@ -163,12 +163,14 @@ class Utility(commands.Cog):
     async def colour(self, ctx, colour: discord.Colour):
         coloursJSON = (await dbcontrol.get_guild(ctx.guild.id))['colours']
         coloursDict = json.loads(coloursJSON)
-        for colour in list(coloursDict.keys()):
-            role = ctx.guild.get_role(coloursDict(colour))
+
+        for key in list(coloursDict.keys()):
+            role = ctx.guild.get_role(coloursDict[str(key)])
             if role in ctx.author.roles:
-                await ctx.send("**Your existing colour role was removed**")
                 await ctx.author.remove_roles(role, reason="Automated colour role removal")
-        if str(colour.value) in coloursDict.keys():
+                await ctx.send("**Your existing colour role was removed**")
+
+        if str(colour.value) in list(coloursDict.keys()):
             role = ctx.guild.get_role(coloursDict[str(colour.value)])
             if role > ctx.guild.me.top_role:
                 return await ctx.send(":x: **I don't have permission to give you thata role**")

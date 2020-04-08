@@ -137,9 +137,9 @@ class Peepo(commands.AutoShardedBot):
 
         self.logger.info('Marking initialization_finished.')
         self.initialization_finished = True
-        await self.cycle(self.SERVER)
+        await self.check(self.SERVER)
 
-    async def cycle(self, guildid):
+    async def check(self, guildid):
         while self.initialization_finished and self.is_ready():
             now = datetime.utcnow().timestamp()
             mutesJSON = (await dbcontrol.get_guild(guildid))['tempmutes']
