@@ -7,6 +7,8 @@ import random
 import utils
 import time
 import re
+import dbcontrol
+import json
 
 class Utility(commands.Cog):
     def __init__(self, bot):
@@ -110,29 +112,7 @@ class Utility(commands.Cog):
             embed.add_field(name='Joke of the Day', value=value, inline=False)
         await msg.edit(embed=embed)
 
-    """
-    @commands.command(brief='Find an active channel', description='List all channels and sort by most recent activity.')
-    async def active(self, ctx):
-        now = datetime.datetime.utcnow()
 
-        embed = discord.Embed()
-        desc = ''
-
-        msg = await ctx.send('``Getting channel history...``')
-
-        channels = {}
-        for channel in ctx.guild.text_channels:
-            lastmsg = [i async for i in channel.history(limit=1)][-1]
-            channels[lastmsg.created_at] = channel.id
-
-        for last in reversed(sorted(channels, key=lambda x: x.timestamp())):
-            channel_id = channels[last]
-            if channel_id != ctx.channel.id:
-                time_str = self.bot.strfdelta((last - now - datetime.timedelta(seconds=25)), ' {hours}h {minutes}m {seconds}s').replace(' 0h', '').replace(' 0m', '').replace(' 0s', '').lstrip()
-                desc += f'**<#{channel_id}> was active ``{time_str}`` ago.**\n\n'
-        embed.description = desc
-        await msg.edit(content=f'', embed=embed)
-    """
     @commands.command(brief='Shows recently deleted messages')
     async def snipe(self, ctx):
         snipes = self.bot.snipe_list
@@ -151,34 +131,27 @@ class Utility(commands.Cog):
         else:
             await ctx.send(':x:**There were no messages to snipe**')
 
-"""
-    @commands.command(aliases=['mc', 'mcserv'], brief='Provides info on a minecraft server', usage='[server ip]')
-    async def minecraft(self, ctx, serverip='gsc.epicgamer.org:25622'):
-        try:
-            async with ctx.typing():
-                serv = MinecraftServer.lookup(str(serverip))
-                status = serv.status().raw
-                latency = serv.ping()
-        except Exception:
-            await ctx.send('**Request failed, the server could not exist or be down**')
-            return
-        desc = status['description']['text']
-        descnew = re.sub('§.', '', desc)
-        if status['players']['online'] > 20:
-            players = 'Many'
+    @commands.command(brief='Adds a role to the user, or lists all available roles', usage="[name]")
+    async def role(self, ctx, name: str = None):
+        rolesJSON = (await dbcontrol.get_guild(ctx.guild.id))['roles']
+        rolesDict = json.loads(rolesJSON) if rolesJSON else {}
+        if name is None:
+            if rolesDict == {}:
+                await ctx.send(":x: **No roles currently available**")
+            else:
+                await ctx.send(f"**Currently available roles:** ```\n" + "\n".join(rolesDict.keys()) + "```")
         else:
-            players = []
-            for i in status['players']['sample']:
-                players.append(i['name'])
-            players = ', '.join(players)
-        embed = discord.Embed(title=serverip, color=discord.Color.blurple())
-        embed.add_field(name='Description', value=descnew, inline=False)
-        embed.add_field(name='Ping', value=f'{latency}ms', inline=False)
-        embed.add_field(name='Version', value=status['version']['name'], inline=False)
-        embed.add_field(name=f"Players ({status['players']['online']}/{status['players']['max']})",
-                       value=None if status['players']['online'] == 0 else players)
-        await ctx.send(embed=embed)
-"""
+            if name not in rolesDict.keys():
+                await ctx.send(f":x: **Role ``{name}`` not found**")
+            else:
+                role = ctx.guild.get_role(rolesDict[name])
+
+                if role > ctx.guild.me.top_role:
+                    await ctx.send(f":x: **I am not allowed to give you the {name} role**")
+                else:
+                    await ctx.author.add_roles(role, reason="Automated role command")
+                    await ctx.send(f":white_check_mark: **You have been given the role ``{role.name}``**")
+
 
 def setup(bot):
     bot.add_cog(Utility(bot))

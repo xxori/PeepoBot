@@ -11,6 +11,7 @@ import json
 import time
 import sys
 import os
+from time import ctime
 import aiohttp
 
 SERVER = 697048716757958666
@@ -94,12 +95,18 @@ class Peepo(commands.AutoShardedBot):
             await super().on_message(message)
 
     async def on_member_join(self, member):
-        announcechan = (dbcontrol.get_guild(SERVER))['announcechannel']
-        defaultrole = (dbcontrol.get_guild(SERVER))['defaultrole']
-        serv = self.get_guild(self, SERVER)
-        if defaultrole is not None:
+        announcechan = (await dbcontrol.get_guild(SERVER))['announcechannel']
+        defaultrole = (await dbcontrol.get_guild(SERVER))['defaultrole']
+        serv = self.get_guild(SERVER)
+        if defaultrole:
             role = serv.get_role(defaultrole)
-            await member.add_role(role, reason="Default role assignment for new member")
+            await member.add_roles(role, reason="Default role assignment for new member")
+        if announcechan:
+            channel = serv.get_channel(announcechan)
+            embed = discord.Embed(title=f"Welcome, {member.name}", description=f"Welcome to {serv.name}!", color=discord.Color.blurple())
+            embed.set_thumbnail(url=member.avatar_url)
+            embed.set_footer(text=str(member), icon_url=member.avatar_url)
+            await channel.send(embed=embed)
 
 
     async def on_message_delete(self, message):
