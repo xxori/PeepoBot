@@ -56,10 +56,10 @@ class ErrorHandler(commands.Cog):
             traceback.print_exception(type(e), e, e.__traceback__)
 
         elif isinstance(e, commands.ExtensionAlreadyLoaded):
-            await ctx.send(f':x: ``{e.args[0]}`` is already loaded.')
+            await ctx.send(f':x:** {e.args[0]}**')
 
         elif isinstance(e, commands.ExtensionNotLoaded):
-            await ctx.send(f':x: ``{e.args[0]}`` is not loaded.')
+            await ctx.send(f':x: **{e.args[0]}**')
 
 
         else:

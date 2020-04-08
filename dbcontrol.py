@@ -17,7 +17,7 @@ async def get_connector():
 
 async def initialize_tables(bot):
     c = await get_connector()
-    await c.execute('CREATE TABLE IF NOT EXISTS users(id INTEGER, seen_in TEXT, level INTEGER, exp INTEGER, exp_required INTEGER, settings TEXT, bio TEXT, image_url TEXT, profile_color INTEGER, blacklist INTEGER)')
+    await c.execute('CREATE TABLE IF NOT EXISTS users(id INTEGER, seen_in TEXT, settings TEXT, bio TEXT, image_url TEXT, profile_color INTEGER, blacklist INTEGER)')
     await c.execute('CREATE TABLE IF NOT EXISTS tags(author INTEGER, guild INTEGER, created REAL, name TEXT, content TEXT)')
     await c.execute('CREATE TABLE IF NOT EXISTS guilds(id INTEGER, prefix TEXT, logchannel INTEGER, muterole INTEGER, announcechannel INTEGER)')
 
@@ -73,7 +73,7 @@ async def add_guild(bot, id):
 
 async def get_guild(guild):
     c = await get_connector()
-    cursor = await c.execute(f'SELECT * FROM guilds WHERE id = ?', guild.id)
+    cursor = await c.execute(f'SELECT * FROM guilds WHERE id = ' + str(guild.id))
     data = await cursor.fetchone()
     await c.close()
     return data
@@ -81,7 +81,7 @@ async def get_guild(guild):
 async def modify_guild(id, parameter, value):
     c = await get_connector()
 
-    await c.execute(f'UPDATE guilds SET ? = ? WHERE id = ?', parameter, value, id)
+    await c.execute(f'UPDATE guilds SET {parameter} = ? WHERE id = ?', (value, id))
     await c.commit()
     await c.close()
 
@@ -105,7 +105,7 @@ async def add_user(id, bot):
 
     if not data:
         settings = json.dumps(settings_template).replace("'", "''")
-        await c.execute(f"INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (id, str([i.id for i in guilds]), 1, 0, 100, str(settings), '', '', '', 0))
+        await c.execute(f"INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (id, str([i.id for i in guilds]), str(settings), '', '', '', 0))
     else:
         await c.execute(f'UPDATE users SET seen_in = ? WHERE id = ?', (str([i.id for i in guilds]), id))
     await c.commit()
@@ -114,7 +114,7 @@ async def add_user(id, bot):
 async def modify_user(id, parameter, value):
     c = await get_connector()
 
-    await c.execute(f'UPDATE users SET ? = ? WHERE id = ?', parameter, value, id)
+    await c.execute(f'UPDATE users SET {parameter} = ? WHERE id = ?', (value, id))
     await c.commit()
     await c.close()
 
@@ -140,7 +140,7 @@ async def get_tag(author, guild, name):
 
 async def get_guild_tag(guild, name):
     c = await get_connector()
-    cursor = await c.execute(f'SELECT * FROM tags WHERE name = ? AND guild = ?', name, guild)
+    cursor = await c.execute(f'SELECT * FROM tags WHERE name = ? AND guild = ?', (name, guild))
     data = await cursor.fetchone()
     await c.close()
     return data
@@ -159,7 +159,7 @@ async def delete_tag(author, guild, name):
 
 async def get_all_tags(author, guild):
     c = await get_connector()
-    cursor = await c.execute(f'SELECT * FROM tags WHERE author = ? AND guild = ?', author, guild)
+    cursor = await c.execute(f'SELECT * FROM tags WHERE author = ? AND guild = ?', (author, guild))
     data = await cursor.fetchall()
     await c.close()
     return data

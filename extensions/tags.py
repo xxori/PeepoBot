@@ -68,7 +68,7 @@ class Tags(commands.Cog):
         embed = discord.Embed(color=discord.Colour.blurple())
         embed.set_author(name=f'Tags by {ctx.author}', icon_url=user.avatar_url)
         for tag in tags:
-            embed.add_field(name=tag['name'], value=datetime.datetime.fromtimestamp(tag['created']).strftime('%A %d %B %Y at %I:%M %p (UTC)'), inline=False)
+            embed.add_field(value=tag['name'], name=datetime.datetime.fromtimestamp(tag['created']).strftime('%A %d %B %Y at %I:%M %p (UTC)'), inline=False)
         await ctx.send(embed=embed)
 
 def setup(bot):
