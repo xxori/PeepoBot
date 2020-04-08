@@ -13,6 +13,8 @@ import sys
 import os
 import aiohttp
 
+SERVER = 697048716757958666
+
 class Peepo(commands.AutoShardedBot):
     def __init__(self, logger, config):
         super(Peepo, self).__init__(command_prefix=commands.when_mentioned_or(';'))
@@ -91,11 +93,20 @@ class Peepo(commands.AutoShardedBot):
 
             await super().on_message(message)
 
+    async def on_member_join(self, member):
+        announcechan = (dbcontrol.get_guild(SERVER))['announcechannel']
+        defaultrole = (dbcontrol.get_guild(SERVER))['defaultrole']
+        serv = self.get_guild(self, SERVER)
+        if defaultrole is not None:
+            role = serv.get_role(defaultrole)
+            await member.add_role(role, reason="Default role assignment for new member")
+
+
     async def on_message_delete(self, message):
         self.snipe_list.append(message)
 
     async def on_guild_join(self, guild):
-        if guild.id != 697048716757958666:
+        if guild.id != SERVER:
             if guild.system_channel:
                 await guild.system_channel.send("**This bot is only for use in PeepoLand**")
             await guild.leave()
