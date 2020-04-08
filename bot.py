@@ -11,15 +11,15 @@ import json
 import time
 import sys
 import os
-from time import ctime
+from datetime import datetime
 import aiohttp
 
-SERVER = 697048716757958666
+
 
 class Peepo(commands.AutoShardedBot):
     def __init__(self, logger, config):
         super(Peepo, self).__init__(command_prefix=commands.when_mentioned_or(';'))
-
+        self.SERVER = 697048716757958666
         self.logger = logger
         self.config = config
 
@@ -57,7 +57,7 @@ class Peepo(commands.AutoShardedBot):
 
     def run(self):
         self.load_cogs()
-        self.run_time = datetime.datetime.utcnow()
+        self.run_time = datetime.utcnow()
         self.logger.info('Loading presences.')
 
         with open('presences.txt', 'r+') as f:
@@ -70,7 +70,7 @@ class Peepo(commands.AutoShardedBot):
         except discord.LoginFailure as e:
             self.logger.critical(f'Login Failure - {e}')
 
-        runtime = datetime.datetime.utcnow() - self.run_time
+        runtime = datetime.utcnow() - self.run_time
         self.logger.info(f'Running duration: {utils.strfdelta(runtime, "%Dd %Hh %Mm %Ss")}')
         #self.logger.info('Closing cleverbot session...')
         #asyncio.get_event_loop().run_until_complete(self.cb.close())
@@ -95,9 +95,9 @@ class Peepo(commands.AutoShardedBot):
             await super().on_message(message)
 
     async def on_member_join(self, member):
-        announcechan = (await dbcontrol.get_guild(SERVER))['announcechannel']
-        defaultrole = (await dbcontrol.get_guild(SERVER))['defaultrole']
-        serv = self.get_guild(SERVER)
+        announcechan = (await dbcontrol.get_guild(self.SERVER))['announcechannel']
+        defaultrole = (await dbcontrol.get_guild(self.SERVER))['defaultrole']
+        serv = self.get_guild(self.SERVER)
         if defaultrole:
             role = serv.get_role(defaultrole)
             await member.add_roles(role, reason="Default role assignment for new member")
@@ -113,7 +113,7 @@ class Peepo(commands.AutoShardedBot):
         self.snipe_list.append(message)
 
     async def on_guild_join(self, guild):
-        if guild.id != SERVER:
+        if guild.id != self.SERVER:
             if guild.system_channel:
                 await guild.system_channel.send("**This bot is only for use in PeepoLand**")
             await guild.leave()
@@ -124,7 +124,7 @@ class Peepo(commands.AutoShardedBot):
         await dbcontrol.initialize_tables(self)
 
         old_time = self.connect_time
-        self.connect_time = datetime.datetime.utcnow()
+        self.connect_time = datetime.utcnow()
         self.logger.info(f'Connection time reset. ({old_time or "n/a"} -> {self.connect_time})')
         self.logger.info(f'Client ready: {self.user} ({self.user.id})')
 
@@ -137,6 +137,24 @@ class Peepo(commands.AutoShardedBot):
 
         self.logger.info('Marking initialization_finished.')
         self.initialization_finished = True
+        await self.mutecycle(self.SERVER)
+
+    async def mutecycle(self, guildid):
+        while self.initialization_finished and self.is_ready():
+            now = datetime.utcnow().timestamp()
+            mutesJSON = (await dbcontrol.get_guild(guildid))['tempmutes']
+            mutesDict = json.loads(mutesJSON)
+            guild = self.get_guild(guildid)
+            muteroleid = (await dbcontrol.get_guild(guildid))['muterole']
+            muterole = guild.get_role(muteroleid)
+            for i in list(mutesDict.keys()):
+                if mutesDict[i] < now:
+                    mutesDict.pop(i)
+                    user = guild.get_member(int(i))
+                    await user.remove_roles(muterole, reason="Tempmute expired")
+            mutesJSON = json.dumps(mutesDict)
+            await dbcontrol.modify_guild(guildid, 'tempmutes', mutesJSON)
+            await asyncio.sleep(10)
 
     async def presence_changer(self):
         possible = [discord.Game(name=i) for i in self.presences]
@@ -148,6 +166,8 @@ class Peepo(commands.AutoShardedBot):
                 await self.change_presence(activity=presences.current)
                 presences.next()
                 await asyncio.sleep(20)
+
+
 
 
 def read_config():

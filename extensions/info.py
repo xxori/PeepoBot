@@ -146,11 +146,18 @@ class Utility(commands.Cog):
             else:
                 role = ctx.guild.get_role(rolesDict[name])
 
-                if role > ctx.guild.me.top_role:
-                    await ctx.send(f":x: **I am not allowed to give you the {name} role**")
+                if role not in ctx.author.roles:
+                    if role > ctx.guild.me.top_role:
+                        await ctx.send(f":x: **I am not allowed to give you the {name} role**")
+                    else:
+                        await ctx.author.add_roles(role, reason="Automated role command")
+                        await ctx.send(f":white_check_mark: **You have been given the role ``{role.name}``**")
                 else:
-                    await ctx.author.add_roles(role, reason="Automated role command")
-                    await ctx.send(f":white_check_mark: **You have been given the role ``{role.name}``**")
+                    if role > ctx.guild.me.top_role:
+                        await ctx.send(f":x: **I am not allowed to remove the {name} role from you**")
+                    else:
+                        await ctx.author.remove_roles(role, reason="Automated role command")
+                        await ctx.send(f":white_check_mark: **You have been removed from the role ``{role.name}``**")
 
 
 def setup(bot):
