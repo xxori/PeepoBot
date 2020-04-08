@@ -154,7 +154,7 @@ class Peepo(commands.AutoShardedBot):
                     await user.remove_roles(muterole, reason="Tempmute expired")
             mutesJSON = json.dumps(mutesDict)
             await dbcontrol.modify_guild(guildid, 'tempmutes', mutesJSON)
-            await asyncio.sleep(10)
+            await asyncio.sleep(30)
 
     async def presence_changer(self):
         possible = [discord.Game(name=i) for i in self.presences]
