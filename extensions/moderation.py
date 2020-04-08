@@ -4,7 +4,7 @@ import utils
 import dbcontrol
 import json
 import asyncio
-from datetime import datetime
+import datetime
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
@@ -99,15 +99,20 @@ class Moderation(commands.Cog):
     @commands.command(brief='Unmutes a server member', usage='[user]', aliases=['umute'])
     async def unmute(self, ctx, target: discord.Member):
         muteID = (await dbcontrol.get_guild(ctx.guild.id))['muterole']
+        mutesJSON = (await dbcontrol.get_guild(ctx.guild.id))['tempmutes']
+        mutesDict = json.loads(mutesJSON)
+
+        if target.id in list(mutesDict.keys()):
+            mutesDict.pop(target.id)
+            mutesJSON = json.dumps(mutesDict)
+            await dbcontrol.modify_guild(ctx.guild.id, 'tempmutes', mutesJSON)
+
         if muteID is None:
             await ctx.send(f":x: **There is no muterole. Assign one with {self.bot.prefix}muterole**")
-
-
         muted = ctx.guild.get_role(muteID)
         if muted is None:
             await ctx.send(f":x: **The muterole does not exist anymore. Assign a new one with {self.bot.preifx}muterole.**")
             return
-
         if muted in target.roles:
             await target.remove_roles(muted)
             await ctx.send(f':thumbsup: **Unmuted ``{target}``**')
@@ -230,7 +235,7 @@ class Moderation(commands.Cog):
             time *= 60
         if unit.lower() in ["h", "hours", "hour"]:
             time *= 3600
-        mutesDict[user.id] = int(datetime.utcnow().timestamp()) + time
+        mutesDict[user.id] = int(datetime.datetime.utcnow().timestamp()) + time
         mutesJSON = json.dumps(mutesDict)
         await dbcontrol.modify_guild(ctx.guild.id, 'tempmutes', mutesJSON)
         await ctx.send(f":white_check_mark:** User {user} temporarily muted for {time}{unit}**")
@@ -242,6 +247,20 @@ class Moderation(commands.Cog):
             mutesDict.pop(user.id)
         if muterole in user.roles:
             await user.remove_roles(muterole, reason="Tempmute expired")
+
+    @commands.command(brief="Checks all tempmuted users", usage="[user]", aliases=["listmutes", "listmute"])
+    async def checkmute(self, ctx, user: discord.Member = None):
+        mutesJSON = (await dbcontrol.get_guild(ctx.guild.id))["tempmutes"]
+        mutesDict = json.loads(mutesJSON)
+        if mutesDict in [{}, ""]:
+            return await ctx.send("**There are currently no members temp muted**")
+        embed = discord.Embed(title=f"Tempmutes in {ctx.guild.name}", color=discord.Color.blurple())
+        for mute in list(mutesDict.keys()):
+            user = ctx.guild.get_member(int(mute))
+            diff = mutesDict[mute] - int(datetime.datetime.utcnow().timestamp())
+            embed.add_field(value=user, name=f"Time remaining: {datetime.timedelta(seconds=diff)}", inline=False)
+            embed.set_footer(text=ctx.guild.name, icon_url=ctx.guild.icon_url)
+        await ctx.send(embed=embed)
 
 
 
