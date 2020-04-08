@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import utils
 import dbcontrol
+import json
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
@@ -180,6 +181,32 @@ class Moderation(commands.Cog):
             rol = (await dbcontrol.get_guild(ctx.guild.id))['defaultrole']
             role = ctx.guild.get_role(rol)
             await ctx.send(f"**The current default role is ``{role.name}``**" if rol else ":x: **No default role found**")
+
+
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(brief='Adds a role for people to add to themselves with the role command', usage="[name] <role>")
+    async def addrole(self, ctx, name, role : discord.Role):
+        rolesJSON = (await dbcontrol.get_guild(ctx.guild.id))['roles']
+        rolesDict = json.loads(rolesJSON) if rolesJSON != "" else {}
+        name = name.lower()
+        rolesDict[name] = role.id
+        rolesJSON = json.dumps(rolesDict)
+        await dbcontrol.modify_guild(ctx.guild.id, 'roles', rolesJSON)
+        await ctx.send(f":white_check_mark: **Role {name} successfully added**")
+
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(brief='Deletes a role for people to add to themselves with the role command', usage="[name]")
+    async def delrole(self, ctx, name):
+        rolesJSON = (await dbcontrol.get_guild(ctx.guild.id))['roles']
+        rolesDict = json.loads(rolesJSON) if rolesJSON != "" else {}
+        name = name.lower()
+        if name not in rolesDict.keys():
+            await ctx.send(f":x: **Role ``{name}`` not found. Check your spelling and try again.**")
+        else:
+            rolesDict.pop(name)
+            rolesJSON = json.dumps(rolesDict)
+            await dbcontrol.modify_guild(ctx.guild.id, 'roles', rolesJSON)
+            await ctx.send(f":white_check_mark: **Role ``{name}`` successfully deleted**")
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
