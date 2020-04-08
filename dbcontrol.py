@@ -42,11 +42,11 @@ async def rebuild_guilds(bot):
     c = await get_connector()
 
     for guild in bot.guilds:
-        cursor = await c.execute(f'SELECT * FROM guilds WHERE id = ?', guild.id)
+        cursor = await c.execute("SELECT * FROM guilds WHERE id = " + str(guild.id))
         data = await cursor.fetchone()
 
         if not data:
-            await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', guild.id, '$', '', '', '')
+            await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', (str(guild.id), '$', '', '', ''))
 
     await c.commit()
     await c.close()
@@ -71,7 +71,7 @@ async def add_guild(bot, id):
 
 # Guild Utilities
 
-async def get_guild(id):
+async def get_guild(guild):
     c = await get_connector()
     cursor = await c.execute(f'SELECT * FROM guilds WHERE id = ?', guild.id)
     data = await cursor.fetchone()
@@ -98,16 +98,16 @@ async def add_user(id, bot):
     if user is None:
         return False
 
-    cursor = await c.execute(f'SELECT * FROM users WHERE id = ?', id)
+    cursor = await c.execute(f'SELECT * FROM users WHERE id = ' + str(id))
     data = await cursor.fetchone()
 
     guilds = [guild for guild in bot.guilds if user in guild.members]
 
     if not data:
         settings = json.dumps(settings_template).replace("'", "''")
-        await c.execute(f"INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", id, str([i.id for i in guilds]), 1, 0, 100, str(settings), '', '', '', '', 0)
+        await c.execute(f"INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (id, str([i.id for i in guilds]), 1, 0, 100, str(settings), '', '', '', 0))
     else:
-        await c.execute(f'UPDATE users SET seen_in = ? WHERE id = ?', str([i.id for i in guilds]), id)
+        await c.execute(f'UPDATE users SET seen_in = ? WHERE id = ?', (str([i.id for i in guilds]), id))
     await c.commit()
     await c.close()
 
@@ -166,7 +166,7 @@ async def get_all_tags(author, guild):
 
 async def is_blacklist(id):
     c = await get_connector()
-    cursor = await c.execute(f'SELECT * FROM users WHERE id = ?', id)
+    cursor = await c.execute(f'SELECT * FROM users WHERE id = ' + str(id))
     data = await cursor.fetchone()
     if data['blacklist'] == 1:
         bl = True

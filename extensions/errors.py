@@ -42,7 +42,7 @@ class ErrorHandler(commands.Cog):
             pass
 
         elif isinstance(e, commands.ExtensionNotFound):
-            await ctx.send(f':x: Extension ``{e.args[0]}`` does not exist.')
+            await ctx.send(f':x: ``{e.args[0]}`` does not exist.')
 
         elif isinstance(e, discord.Forbidden):
             await ctx.send(f':x: **I am not authorized to do that.**')
@@ -56,10 +56,10 @@ class ErrorHandler(commands.Cog):
             traceback.print_exception(type(e), e, e.__traceback__)
 
         elif isinstance(e, commands.ExtensionAlreadyLoaded):
-            await ctx.send(f':x: Extension ``{e.args[0]}`` is already loaded.')
+            await ctx.send(f':x: ``{e.args[0]}`` is already loaded.')
 
         elif isinstance(e, commands.ExtensionNotLoaded):
-            await ctx.send(f':x: Extension ``{e.args[0]}`` is not loaded.')
+            await ctx.send(f':x: ``{e.args[0]}`` is not loaded.')
 
 
         else:

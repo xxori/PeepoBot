@@ -13,9 +13,9 @@ import sys
 import os
 import aiohttp
 
-class GTXBot(commands.AutoShardedBot):
+class Peepo(commands.AutoShardedBot):
     def __init__(self, logger, config):
-        super(GTXBot, self).__init__(command_prefix=commands.when_mentioned_or('$'))
+        super(Peepo, self).__init__(command_prefix=commands.when_mentioned_or(';'))
 
         self.logger = logger
         self.config = config
@@ -63,7 +63,7 @@ class GTXBot(commands.AutoShardedBot):
         self.logger.info('Pre-start checks cleared, start login.')
 
         try:
-            super(GTXBot, self).run(self.config['token'])
+            super(Peepo, self).run(self.config['token'])
         except discord.LoginFailure as e:
             self.logger.critical(f'Login Failure - {e}')
 
@@ -77,25 +77,32 @@ class GTXBot(commands.AutoShardedBot):
 
     async def on_message(self, message):
         if self.initialization_finished and self.is_ready:
+            
             ctx = await self.get_context(message)
+
             if ctx.valid:
                 if ctx.guild == None:
                     await ctx.send(":x:**Commands may not function correctly in dms**")
                     return
+
                 if await dbcontrol.is_blacklist(message.author.id):
-                    await message.channel.send(f'Sorry, {message.author}, you are blacklisted and cannot use commands.')
-                    return
+                   await message.channel.send(f'Sorry, {message.author}, you are blacklisted and cannot use commands.')
+                   return
+
             await super().on_message(message)
 
     async def on_message_delete(self, message):
         self.snipe_list.append(message)
 
-    #async def on_message_delete(self, message):
-    #    if message.author.id != self.user.id:
-    #        await message.channel.send('No sniping in my server, young punk', delete_after=0)
+    async def on_guild_join(self, guild):
+        if guild.id != 697048716757958666:
+            if guild.system_channel:
+                await guild.system_channel.send("**This bot is only for use in PeepoLand**")
+            await guild.leave()
 
     async def on_ready(self):
         self.logger.info('Initializing database.')
+        
         await dbcontrol.initialize_tables(self)
 
         old_time = self.connect_time
@@ -175,7 +182,7 @@ if __name__ == '__main__':
         logger.addHandler(filehandler)
 
     time.sleep(0.1)
-    bot = GTXBot(logger=logger, config=config)
+    bot = Peepo(logger=logger, config=config)
 
     bot.run()
 

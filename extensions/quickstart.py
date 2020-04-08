@@ -18,8 +18,8 @@ class Quickstart(commands.Cog):
             invite_msg = '''
     :thumbsup: **Thanks for adding me to ``ree``!**
     
-            My prefix is ``sudo`` by default.
-            To get started with using me, do ``sudo help`` in your server.
+            My prefix is ``;`` by default.
+            To get started with using me, do ``;help`` in your server.
     
     :wave: See ya around!
                 '''
