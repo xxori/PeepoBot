@@ -88,9 +88,9 @@ class Peepo(commands.AutoShardedBot):
                     await ctx.send(":x:**Commands may not function correctly in dms**")
                     return
 
-                if await dbcontrol.is_blacklist(message.author.id):
-                   await message.channel.send(f'Sorry, {message.author}, you are blacklisted and cannot use commands.')
-                   return
+                #if await dbcontrol.is_blacklist(message.author.id):
+                 #  await message.channel.send(f'Sorry, {message.author}, you are blacklisted and cannot use commands.')
+                  # return
 
             await super().on_message(message)
 

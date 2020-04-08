@@ -103,8 +103,8 @@ class Moderation(commands.Cog):
         mutesJSON = (await dbcontrol.get_guild(ctx.guild.id))['tempmutes']
         mutesDict = json.loads(mutesJSON)
 
-        if target.id in list(mutesDict.keys()):
-            mutesDict.pop(target.id)
+        if str(target.id) in list(mutesDict.keys()):
+            mutesDict.pop(str(target.id))
             mutesJSON = json.dumps(mutesDict)
             await dbcontrol.modify_guild(ctx.guild.id, 'tempmutes', mutesJSON)
 
@@ -227,7 +227,7 @@ class Moderation(commands.Cog):
             return await ctx.send(f":x: **The current muterole is invalid**")
         if muterole > ctx.guild.me.top_role:
             return await ctx.send(f":x: **The current muterole is higher than my highest role**")
-        await user.add_roles(muterole, reason=f"{ctx.author}:" + reason or "" + f":{time}{unit}")
+        await user.add_roles(muterole, reason=f"{ctx.author}:" + f":{time}{unit}")
         await ctx.send(f":white_check_mark:** User {user} temporarily muted for {time}{unit}**")
         mutesJSON = (await dbcontrol.get_guild(ctx.guild.id))['tempmutes']
         mutesDict = json.loads(mutesJSON) or {}
