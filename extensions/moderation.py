@@ -53,6 +53,7 @@ class Moderation(commands.Cog):
             raise utils.HierarchyPermissionError(ctx, target)
         else:
             await ctx.send(f':thumbsup: **Kicked ``{target}``{f" for ``{reason}``" if reason is not None else ""}**')
+            await self.bot.log(ctx.guild, f"")
 
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True)
@@ -219,18 +220,17 @@ class Moderation(commands.Cog):
 
     @commands.has_permissions(manage_roles=True)
     @commands.command(brief='Temporarily mutes a user', usage='[user] <minutes>', aliases=["tmute"])
-    async def tempmute(self, ctx, user: discord.Member, time: int, unit = "s"):
+    async def tempmute(self, ctx, user: discord.Member, time: int, unit = "s", reason=None):
         muteroleid = (await dbcontrol.get_guild(ctx.guild.id))['muterole']
         muterole = ctx.guild.get_role(muteroleid)
         if muterole is None:
             return await ctx.send(f":x: **The current muterole is invalid**")
         if muterole > ctx.guild.me.top_role:
             return await ctx.send(f":x: **The current muterole is higher than my highest role**")
-        await user.add_roles(muterole, reason=f"Tempmute: {time}{unit} by {ctx.author}")
-
+        await user.add_roles(muterole, reason=f"{ctx.author}:" + reason or "" + f":{time}{unit}")
+        await ctx.send(f":white_check_mark:** User {user} temporarily muted for {time}{unit}**")
         mutesJSON = (await dbcontrol.get_guild(ctx.guild.id))['tempmutes']
         mutesDict = json.loads(mutesJSON) or {}
-
         if unit.lower() in ["m", "minutes", "minute"]:
             time *= 60
         if unit.lower() in ["h", "hours", "hour"]:
@@ -238,7 +238,6 @@ class Moderation(commands.Cog):
         mutesDict[user.id] = int(datetime.datetime.utcnow().timestamp()) + time
         mutesJSON = json.dumps(mutesDict)
         await dbcontrol.modify_guild(ctx.guild.id, 'tempmutes', mutesJSON)
-        await ctx.send(f":white_check_mark:** User {user} temporarily muted for {time}{unit}**")
 
         await asyncio.sleep(time)
         mutesJSON = (await dbcontrol.get_guild(ctx.guild.id))['tempmutes']

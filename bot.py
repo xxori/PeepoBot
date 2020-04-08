@@ -137,9 +137,9 @@ class Peepo(commands.AutoShardedBot):
 
         self.logger.info('Marking initialization_finished.')
         self.initialization_finished = True
-        await self.mutecycle(self.SERVER)
+        await self.cycle(self.SERVER)
 
-    async def mutecycle(self, guildid):
+    async def cycle(self, guildid):
         while self.initialization_finished and self.is_ready():
             now = datetime.utcnow().timestamp()
             mutesJSON = (await dbcontrol.get_guild(guildid))['tempmutes']
@@ -154,6 +154,21 @@ class Peepo(commands.AutoShardedBot):
                     await user.remove_roles(muterole, reason="Tempmute expired")
             mutesJSON = json.dumps(mutesDict)
             await dbcontrol.modify_guild(guildid, 'tempmutes', mutesJSON)
+
+            coloursJSON = (await dbcontrol.get_guild(guildid))['colours']
+            coloursDict = json.loads(coloursJSON)
+            for colour in list(coloursDict.keys()):
+                used = False
+                role = guild.get_role(coloursDict[colour])
+                for member in guild.members:
+                    if role in member.roles:
+                        used = True
+                if not used:
+                    await role.delete(reason="Automated colour role removal, no users have role")
+                    coloursDict.pop(colour)
+            coloursJSON = json.dumps(coloursDict)
+            await dbcontrol.modify_guild(guildid, 'colours', coloursJSON)
+
             await asyncio.sleep(30)
 
     async def presence_changer(self):
@@ -166,6 +181,13 @@ class Peepo(commands.AutoShardedBot):
                 await self.change_presence(activity=presences.current)
                 presences.next()
                 await asyncio.sleep(20)
+
+    async def log(self, guild, message):
+        logchannel = (await dbcontrol.get_guild(guild.id))['logchannel']
+        if announcechannel ==  "":
+            return
+        channel = guild.get_channel(logchannel)
+        await channel.send(f"[{datetime.utcnow().strptime('%d/%m/y %H:%M')} UTC] " + str(message))
 
 
 

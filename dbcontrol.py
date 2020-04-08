@@ -19,7 +19,7 @@ async def initialize_tables(bot):
     c = await get_connector()
     await c.execute('CREATE TABLE IF NOT EXISTS users(id INTEGER, seen_in TEXT, settings TEXT, bio TEXT, image_url TEXT, profile_color INTEGER, blacklist INTEGER)')
     await c.execute('CREATE TABLE IF NOT EXISTS tags(author INTEGER, guild INTEGER, created REAL, name TEXT, content TEXT)')
-    await c.execute('CREATE TABLE IF NOT EXISTS guilds(id INTEGER, prefix TEXT, logchannel INTEGER, muterole INTEGER, announcechannel INTEGER, defaultrole INTEGER, roles TEXT, tempmutes TEXT)')
+    await c.execute('CREATE TABLE IF NOT EXISTS guilds(id INTEGER, prefix TEXT, logchannel INTEGER, muterole INTEGER, announcechannel INTEGER, defaultrole INTEGER, roles TEXT, tempmutes TEXT, colours TEXT)')
 
     bot.logger.info('Rebuilding guild database.')
     await rebuild_guilds(bot)
@@ -46,7 +46,7 @@ async def rebuild_guilds(bot):
         data = await cursor.fetchone()
 
         if not data:
-            await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (str(guild.id), '$', '', '', '', '', ""))
+            await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', (str(guild.id), '$', '', '', '', '', '{}', '[]'))
 
     await c.commit()
     await c.close()
@@ -60,7 +60,7 @@ async def add_guild(bot, id):
         if 'announcements' in channel.name.strip():
             announcements_channel = channel.id
 
-    await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', id, '$', -1, -1, announcements_channel, -1, -1, -1)
+    await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', id, '$', -1, -1, announcements_channel, -1, -1, -1, -1)
 
     for member in guild.members:
         add_user(member.id, bot)
