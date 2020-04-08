@@ -19,7 +19,7 @@ async def initialize_tables(bot):
     c = await get_connector()
     await c.execute('CREATE TABLE IF NOT EXISTS users(id INTEGER, seen_in TEXT, settings TEXT, bio TEXT, image_url TEXT, profile_color INTEGER, blacklist INTEGER)')
     await c.execute('CREATE TABLE IF NOT EXISTS tags(author INTEGER, guild INTEGER, created REAL, name TEXT, content TEXT)')
-    await c.execute('CREATE TABLE IF NOT EXISTS guilds(id INTEGER, prefix TEXT, logchannel INTEGER, muterole INTEGER, announcechannel INTEGER)')
+    await c.execute('CREATE TABLE IF NOT EXISTS guilds(id INTEGER, prefix TEXT, logchannel INTEGER, muterole INTEGER, announcechannel INTEGER, defaultrole INTEGER)')
 
     bot.logger.info('Rebuilding guild database.')
     await rebuild_guilds(bot)
@@ -46,7 +46,7 @@ async def rebuild_guilds(bot):
         data = await cursor.fetchone()
 
         if not data:
-            await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', (str(guild.id), '$', '', '', ''))
+            await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?, ?)', (str(guild.id), '$', '', '', '', ''))
 
     await c.commit()
     await c.close()
@@ -60,7 +60,7 @@ async def add_guild(bot, id):
         if 'announcements' in channel.name.strip():
             announcements_channel = channel.id
 
-    await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', id, '$', -1. -1, announcements_channel)
+    await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', id, '$', -1, -1, announcements_channel, -1)
 
     for member in guild.members:
         add_user(member.id, bot)
@@ -71,9 +71,9 @@ async def add_guild(bot, id):
 
 # Guild Utilities
 
-async def get_guild(guild):
+async def get_guild(id):
     c = await get_connector()
-    cursor = await c.execute(f'SELECT * FROM guilds WHERE id = ' + str(guild.id))
+    cursor = await c.execute(f'SELECT * FROM guilds WHERE id = ' + str(id))
     data = await cursor.fetchone()
     await c.close()
     return data
@@ -105,7 +105,7 @@ async def add_user(id, bot):
 
     if not data:
         settings = json.dumps(settings_template).replace("'", "''")
-        await c.execute(f"INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (id, str([i.id for i in guilds]), str(settings), '', '', '', 0))
+        await c.execute(f"INSERT INTO users VALUES (?, ?, ?, ?, ?, ?, ?)", (id, str([i.id for i in guilds]), str(settings), '', '', '', 0))
     else:
         await c.execute(f'UPDATE users SET seen_in = ? WHERE id = ?', (str([i.id for i in guilds]), id))
     await c.commit()
