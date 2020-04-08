@@ -230,11 +230,19 @@ class Moderation(commands.Cog):
             time *= 60
         if unit.lower() in ["h", "hours", "hour"]:
             time *= 3600
-
         mutesDict[user.id] = int(datetime.utcnow().timestamp()) + time
         mutesJSON = json.dumps(mutesDict)
         await dbcontrol.modify_guild(ctx.guild.id, 'tempmutes', mutesJSON)
         await ctx.send(f":white_check_mark:** User {user} temporarily muted for {time}{unit}**")
+
+        await asyncio.sleep(time)
+        mutesJSON = (await dbcontrol.get_guild(ctx.guild.id))['tempmutes']
+        mutesDict = json.loads(mutesJSON)
+        if user.id in mutesDict.keys():
+            mutesDict.pop(user.id)
+        if muterole in user.roles:
+            await user.remove_roles(muterole, reason="Tempmute expired")
+
 
 
 def setup(bot):
