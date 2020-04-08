@@ -4,7 +4,6 @@ import aiohttp
 
 import asyncio
 #import pyppeteer as pyp
-from bs4 import BeautifulSoup
 
 import re
 from collections import Counter
@@ -80,52 +79,6 @@ def strfdelta(tdelta, fmt):
     delta['H'], remainder = divmod(tdelta.seconds, 3600)
     delta['M'], delta["S"] = divmod(remainder, 60)
     return fmt.replace('%D', str(delta['D'])).replace('%H', str(delta['H'])).replace('%M', str(delta['M'])).replace('%S', str(delta['S']))
-
-'''
-class CleverBot:
-    browser = None
-    page = None
-    element = None
-
-    def __init__(self):
-        pass
-
-    async def init(self):
-        self.browser = await pyp.launcher.launch()
-        self.page = await self.browser.newPage()
-        await self.page.goto("https://www.cleverbot.com")
-        self.element =  await self.page.querySelector("input.stimulus")
-
-
-    async def getResponse(self, text):
-        """
-        Send text to Cleverbot and recieve response
-        """
-        await self.element.type(text)
-        await self.element.press("Enter")
-
-        diff_history = [1, 1, 1]
-        text = ''
-        text_last = ''
-        diff = 0
-
-        for i in range(200):
-            html = await self.page.content()
-            soup = BeautifulSoup(html, features="html.parser")
-            text = soup.find("p", {"id":"line1"}).getText().strip()
-            if len(text) > 0:
-                diff = len(text) - len(text_last)
-                diff_history.append(diff)
-                text_last = text
-
-                if diff_history[-3:] == [0, 0, 0]:
-                    break
-        return text
-
-    async def close(self):
-        await self.page.close()
-        await self.browser.close()
-'''
 
 
 # Checks if music is currently playing
