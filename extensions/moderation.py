@@ -3,6 +3,8 @@ from discord.ext import commands
 import utils
 import dbcontrol
 import json
+import asyncio
+from datetime import datetime
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
@@ -11,6 +13,8 @@ class Moderation(commands.Cog):
     @property
     def description(self):
         return 'Moderation-related commands. Admin-only.'
+
+
 
     @commands.has_permissions(ban_members=True)
     @commands.bot_has_permissions(ban_members=True)
@@ -207,6 +211,31 @@ class Moderation(commands.Cog):
             rolesJSON = json.dumps(rolesDict)
             await dbcontrol.modify_guild(ctx.guild.id, 'roles', rolesJSON)
             await ctx.send(f":white_check_mark: **Role ``{name}`` successfully deleted**")
+
+    @commands.has_permissions(manage_roles=True)
+    @commands.command(brief='Temporarily mutes a user', usage='[user] <minutes>', aliases=["tmute"])
+    async def tempmute(self, ctx, user: discord.Member, time: int, unit = "s"):
+        muteroleid = (await dbcontrol.get_guild(ctx.guild.id))['muterole']
+        muterole = ctx.guild.get_role(muteroleid)
+        if muterole is None:
+            return await ctx.send(f":x: **The current muterole is invalid**")
+        if muterole > ctx.guild.me.top_role:
+            return await ctx.send(f":x: **The current muterole is higher than my highest role**")
+        await user.add_roles(muterole, reason=f"Tempmute: {time}{unit} by {ctx.author}")
+
+        mutesJSON = (await dbcontrol.get_guild(ctx.guild.id))['tempmutes']
+        mutesDict = json.loads(mutesJSON) or {}
+
+        if unit.lower() in ["m", "minutes", "minute"]:
+            time *= 60
+        if unit.lower() in ["h", "hours", "hour"]:
+            time *= 3600
+
+        mutesDict[user.id] = int(datetime.utcnow().timestamp()) + time
+        mutesJSON = json.dumps(mutesDict)
+        await dbcontrol.modify_guild(ctx.guild.id, 'tempmutes', mutesJSON)
+        await ctx.send(f":white_check_mark:** User {user} temporarily muted for {time}{unit}**")
+
 
 def setup(bot):
     bot.add_cog(Moderation(bot))
