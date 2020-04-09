@@ -22,7 +22,7 @@ class Peepo(commands.AutoShardedBot):
         self.SERVER = 697048716757958666
         self.logger = logger
         self.config = config
-
+        self.command_prefix = ";"
         self.version = '1.0.0'
         self.run_time = None
         self.connect_time = None
