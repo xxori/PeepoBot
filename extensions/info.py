@@ -9,28 +9,6 @@ import time
 import re
 import dbcontrol
 import json
-import epicbox
-
-def safe_execute(code):
-    epicbox.configure(
-        profiles=[
-            epicbox.Profile('python_safe', 'python:latest')
-        ]
-    )
-
-    s = time.time()
-    files = [{'name': 'main.py', 'content': code.encode('utf-8')}]
-    limits = {'cputime': 1, 'memory': 64}
-    result = epicbox.run('python_safe', 'python3 main.py', files=files, limits=limits)
-
-    e = time.time()
-    return result, e-s
-
-def cleanup_code(content):
-    if content.startswith('```') and content.endswith('```'):
-        return ''.join(reversed(''.join(reversed('\n'.join(content.split('\n')[1:]))).replace('```', '', 1)))
-
-    return content.strip('` \n')
 
 class Utility(commands.Cog):
     def __init__(self, bot):
@@ -43,7 +21,7 @@ class Utility(commands.Cog):
 
     @commands.command(brief='Get information about the current guild.', description='Shows useful information like membercount, rolecount and creation date')
     async def ginfo(self, ctx):
-        embed = discord.Embed(colour=discord.Colour.blurple())
+        embed = discord.Embed(colour=discord.Colour.blurple(), timestamp=datetime.datetime.utcnow())
         embed.set_author(name='Guild Info')
 
         embed.add_field(name='Name', value=ctx.guild.name, inline=False)
@@ -57,6 +35,7 @@ class Utility(commands.Cog):
         embed.add_field(name='Channels', value=f'{len(ctx.guild.text_channels)} text, {len(ctx.guild.voice_channels)} voice', inline=False)
         embed.add_field(name='Roles', value=str(len(ctx.guild.roles)), inline=False)
         embed.add_field(name='Region', value=str(ctx.guild.region).capitalize(), inline=False)
+
 
         embed.set_thumbnail(url=ctx.guild.icon_url)
         await ctx.send(embed=embed)
@@ -208,71 +187,6 @@ class Utility(commands.Cog):
             await dbcontrol.modify_guild(ctx.guild.id, 'colours', coloursJSON)
             await ctx.author.add_roles(role, reason="Automated colour command")
             await ctx.send(f":white_check_mark: **You have been given the role ``{colour.value}``**")
-
-    @commands.command(brief="Executes python code in docker container", aliases=["py"], usage="[code]")
-    async def exec(self, ctx, *, code):
-        code_cleaned = cleanup_code(code)
-
-        embed = discord.Embed(
-            title=':stopwatch: **Executing...**',
-            description=f'```python\n{code_cleaned}```'
-        )
-        embed.set_footer(text='Time limit: 5 seconds')
-        msg = await ctx.send(ctx.author.mention, embed=embed)
-        result, etime = safe_execute(code_cleaned)
-
-        if result['timeout']:
-            embed = discord.Embed(
-                colour=discord.Colour.red(),
-                title='**Execution Aborted**',
-                description='``Your exec job took too long.``'
-            )
-            await msg.edit(value=f'{ctx.author.mention}, your exec job finished.', embed=embed)
-
-            return False
-
-        embed = discord.Embed(
-            colour=discord.Colour.green(),
-            title='**Execution Results**',
-            description=f'``Took: {round(etime * 1000, 2)}ms``'
-        )
-
-        ecode = result["exit_code"]
-        try:
-            stdout = result["stdout"].decode("utf-8", errors='replace') or "<no output>\n"
-        except:
-            stdout = '<output decode error>\n'
-        out = f'```py\n{stdout}\n[exited, code {ecode}]```'
-
-        if len(out) > 1000:
-            out = '```py\n(too long to display)\n' + '\n'.join(out[-500:].split('\n')[1:])
-
-        embed.add_field(name='**Output (``stdout``)**', value=out)
-
-        try:
-            stderr = result['stderr'].decode('utf-8')
-        except:
-            stderr = '<output decode error>\n'
-
-        if stderr != '':
-            if len(stderr) > 1000:
-                stderr = '\n'.join(stderr[-500:].split('\n')[1:])
-                embed.add_field(
-                    name='**Errors (``stderr``)**',
-                    value=f'*There were some errors while executing your code.*\n ```py\n(too long to display)\n{stderr}```',
-                    inline=False
-                )
-            else:
-                embed.add_field(
-                    name='**Errors (``stderr``)**',
-                    value=f'*There were some errors while executing your code.*\n ```py\n{stderr}```',
-                    inline=False
-                )
-
-            embed.colour = discord.Colour.orange()
-            await msg.edit(value=f'{ctx.author.mention}, your exec job finished.', embed=embed)
-        else:
-            await msg.edit(value=f'{ctx.author.mention}, your exec job finished.', embed=embed)
 
 
 

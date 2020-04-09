@@ -53,7 +53,6 @@ class Moderation(commands.Cog):
             raise utils.HierarchyPermissionError(ctx, target)
         else:
             await ctx.send(f':thumbsup: **Kicked ``{target}``{f" for ``{reason}``" if reason is not None else ""}**')
-            await self.bot.log(ctx.guild, f"")
 
     @commands.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True)
