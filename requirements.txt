@@ -2,3 +2,5 @@ discord
 asyncio
 aiohttp
 aiosqlite
+youtube_dl
+epicbox
