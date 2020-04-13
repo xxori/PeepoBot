@@ -9,6 +9,7 @@ import time
 import re
 import dbcontrol
 import json
+from colour import COLOURS
 
 class Utility(commands.Cog):
     def __init__(self, bot):
@@ -160,33 +161,47 @@ class Utility(commands.Cog):
                         await ctx.author.remove_roles(role, reason="Automated role command")
                         await ctx.send(f":white_check_mark: **You have been removed from the role ``{role.name}``**")
 
-    @commands.command(brief="Creates a new role with specified color", usage="[hex]")
-    async def colour(self, ctx, colour: discord.Colour):
+    @commands.command(brief="Creates a new role with specified color", usage="[hex or colour name]", aliases=['color'])
+    async def colour(self, ctx, *, colour):
         coloursJSON = (await dbcontrol.get_guild(ctx.guild.id))['colours']
         coloursDict = json.loads(coloursJSON)
 
-        for key in list(coloursDict.keys()):
-            role = ctx.guild.get_role(coloursDict[str(key)])
-            if role in ctx.author.roles:
-                await ctx.author.remove_roles(role, reason="Automated colour role removal")
-                await ctx.send("**Your existing colour role was removed**")
-
-        if str(colour.value) in list(coloursDict.keys()):
-            role = ctx.guild.get_role(coloursDict[str(colour.value)])
-            if role > ctx.guild.me.top_role:
-                return await ctx.send(":x: **I don't have permission to give you thata role**")
-            if role in ctx.author.roles:
-                return await ctx.send(":x: **You already have this role**")
-            await ctx.author.add_roles(role, reason="Automated colour command")
-            await ctx.send(f":white_check_mark: **You have been given the role ``{colour.value}``**")
-
+        hex = utils.hex(colour.replace("#", ""))
+        if hex != "Invalid":
+            colour = discord.Colour(hex)
+        elif colour.lower() in COLOURS.keys():
+            colour = discord.Colour(utils.hex(COLOURS[colour.lower()]))
         else:
-            role = await ctx.guild.create_role(name=str(colour.value), colour=colour)
-            coloursDict[colour.value] = role.id
-            coloursJSON = json.dumps(coloursDict)
-            await dbcontrol.modify_guild(ctx.guild.id, 'colours', coloursJSON)
-            await ctx.author.add_roles(role, reason="Automated colour command")
-            await ctx.send(f":white_check_mark: **You have been given the role ``{colour.value}``**")
+            await ctx.send(":x: **Invalid colour**")
+            colour = False
+
+        if colour:
+            for key in list(coloursDict.keys()):
+                role = ctx.guild.get_role(coloursDict[str(key)])
+                if role is None:
+                    coloursDict.pop(key)
+                    coloursJSON = json.dumps(coloursDict)
+                    await dbcontrol.modify_guild(ctx.guild.id, 'colours', coloursJSON)
+                if role in ctx.author.roles:
+                    await ctx.author.remove_roles(role, reason="Automated colour role removal")
+                    await ctx.send("**Your existing colour role was removed**")
+
+            if str(colour.value) in list(coloursDict.keys()):
+                role = ctx.guild.get_role(coloursDict[str(colour.value)])
+                if role > ctx.guild.me.top_role:
+                    return await ctx.send(":x: **I don't have permission to give you thata role**")
+                if role in ctx.author.roles:
+                    return await ctx.send(":x: **You already have this role**")
+                await ctx.author.add_roles(role, reason="Automated colour command")
+                await ctx.send(f":white_check_mark: **You have been given the role ``{colour.value}``**")
+
+            else:
+                role = await ctx.guild.create_role(name=str(colour.value), colour=colour)
+                coloursDict[colour.value] = role.id
+                coloursJSON = json.dumps(coloursDict)
+                await dbcontrol.modify_guild(ctx.guild.id, 'colours', coloursJSON)
+                await ctx.author.add_roles(role, reason="Automated colour command")
+                await ctx.send(f":white_check_mark: **You have been given the role ``{colour.value}``**")
 
 
 

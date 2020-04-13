@@ -4,7 +4,7 @@ import aiohttp
 
 import asyncio
 #import pyppeteer as pyp
-
+from functools import wraps
 import re
 from collections import Counter
 
@@ -100,3 +100,15 @@ async def in_voice_channel(ctx):
     else:
         await ctx.send("**:x:You need to be in the same voice channel as the bot to run this command**")
         return False
+
+# Checks if the given argument is a hexadecimal number
+def hex(num: str):
+    try:
+        hex = int(num, base=16)
+        if hex < 0:
+            return "Invalid"
+        if len(num) > 6:
+            return "Invalid"
+        return hex
+    except:
+        return "Invalid"

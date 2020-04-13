@@ -15,7 +15,6 @@ from datetime import datetime
 import aiohttp
 
 
-
 class Peepo(commands.AutoShardedBot):
     def __init__(self, logger, config):
         super(Peepo, self).__init__(command_prefix=commands.when_mentioned_or(';'))
@@ -88,9 +87,9 @@ class Peepo(commands.AutoShardedBot):
                     await ctx.send(":x:**Commands may not function correctly in dms**")
                     return
 
-                #if await dbcontrol.is_blacklist(message.author.id):
-                 #  await message.channel.send(f'Sorry, {message.author}, you are blacklisted and cannot use commands.')
-                  # return
+                if await dbcontrol.is_blacklist(message.author.id):
+                   await message.channel.send(f'Sorry, {message.author}, you are blacklisted and cannot use commands.')
+                   return
 
             await super().on_message(message)
 
@@ -213,7 +212,6 @@ def read_config():
 
 if __name__ == '__main__':
     config = read_config()
-
     logger = logging.getLogger('discord')
     logger.setLevel(logging.INFO)
 
