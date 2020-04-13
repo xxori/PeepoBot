@@ -168,8 +168,11 @@ async def is_blacklist(id):
     c = await get_connector()
     cursor = await c.execute(f'SELECT * FROM users WHERE id = ' + str(id))
     data = await cursor.fetchone()
-    if data['blacklist'] == 1:
-        bl = True
+    if 'blacklist' in data.keys():
+        if data['blacklist'] == 1:
+            bl = True
+        else:
+            bl = False
     else:
         bl = False
     await c.close()
