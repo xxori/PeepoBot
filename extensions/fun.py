@@ -2,9 +2,9 @@ import aiohttp
 import discord
 from discord.ext import commands
 import dbcontrol
-import aiosqlite
 import random
 import utils
+import datetime
 
 
 class Fun(commands.Cog):
@@ -26,8 +26,9 @@ class Fun(commands.Cog):
                 embed = discord.Embed(description='No Results Found!', color=0xFF0000)
                 await ctx.send(embed=embed)
             else:
-                embed = discord.Embed(color=0x00FF00)
+                embed = discord.Embed(color=discord.Colour.blurple(), timestamp=datetime.datetime.utcnow())
                 embed.set_author(name=f'Definition of {term}')
+                embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
                 embed.add_field(name='Top Definitions: ', value=data['list'][0]['definition'].replace('[', '').replace(']', ''), inline=False)
                 embed.add_field(name='Examples: ', value=data['list'][0]['example'].replace('[', '').replace(']', ''), inline=False)
                 await ctx.send(embed=embed)
@@ -39,7 +40,8 @@ class Fun(commands.Cog):
                 response = await session.get(url='https://meme-api.herokuapp.com/gimme/dankmemes')
                 data = await response.json()
                 await session.close()
-            embed = discord.Embed(title=data['title'])
+            embed = discord.Embed(title=data['title'], timestamp=datetime.datetime.utcnow())
+            embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
             embed.set_image(url=data['url'])
             await ctx.send(embed=embed)
 
