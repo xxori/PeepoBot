@@ -9,7 +9,6 @@ import time
 import re
 import dbcontrol
 import json
-from colour import COLOURS
 
 class Utility(commands.Cog):
     def __init__(self, bot):
@@ -166,14 +165,7 @@ class Utility(commands.Cog):
         coloursJSON = (await dbcontrol.get_guild(ctx.guild.id))['colours']
         coloursDict = json.loads(coloursJSON)
 
-        hex = utils.hex(colour.replace("#", ""))
-        if hex != "Invalid":
-            colour = discord.Colour(hex)
-        elif colour.lower() in COLOURS.keys():
-            colour = discord.Colour(utils.hex(COLOURS[colour.lower()]))
-        else:
-            await ctx.send(":x: **Invalid colour**")
-            colour = False
+        colour = utils.colour(colour)
 
         if colour:
             for key in list(coloursDict.keys()):

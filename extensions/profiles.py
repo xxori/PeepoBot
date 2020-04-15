@@ -43,9 +43,14 @@ class Profiles(commands.Cog):
             await ctx.send(embed=embed)
 
     @profile.command(brief='Sets profile embed colour', aliases=['colour'], usage='<colour>')
-    async def color(self, ctx, *, color: discord.Color):
-        await dbcontrol.modify_user(ctx.author.id, 'profile_color', color.value)
-        await ctx.send(f":white_check_mark: **Profile color set to `{color}`.**")
+    async def color(self, ctx, *, colour):
+
+        colour = utils.colour(colour)
+        if colour:
+            await dbcontrol.modify_user(ctx.author.id, 'profile_color', colour.value)
+            await ctx.send(f":white_check_mark: **Profile color set to `{colour.value}`.**")
+        else:
+            await ctx.send(":x: **Invalid colour**")
 
     @profile.command(brief='Sets bio text on profile')
     async def bio(self, ctx, *, bio):

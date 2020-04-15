@@ -19,10 +19,10 @@ class Settings(commands.Cog):
     @settings.command(brief="Sets the default role for new users", usage='[role]')
     async def defaultrole(self, ctx, role: discord.Role = None):
         if role is not None:
-            await dbcontrol.modify_guild(ctx.guild.id, "defaultrole", role.id)
+            await dbcontrol.modify_setting(ctx.guild.id, "defaultrole", role.id)
             await ctx.send(f":white_check_mark: **Default role set to ``{role.name}``**")
         else:
-            rol = (await dbcontrol.get_guild(ctx.guild.id))['defaultrole']
+            rol = await dbcontrol.get_setting(ctx.guild.id, 'defaultrole')
             role = ctx.guild.get_role(rol)
             await ctx.send(f"**The current default role is ``{role.name}``**" if rol else ":x: **No default role found**")
 
@@ -31,10 +31,10 @@ class Settings(commands.Cog):
     @settings.command(brief="Sets the channel for logging.", usage='[channel]')
     async def logchannel(self, ctx, channel: discord.TextChannel = None):
         if channel is not None:
-            await dbcontrol.modify_guild(ctx.guild.id, "logchannel", channel.id)
+            await dbcontrol.modify_setting(ctx.guild.id, "logchannel", channel.id)
             await  ctx.send(f":white_check_mark: **Log channel set to ``{channel.name}``**")
         else:
-            chan = (await dbcontrol.get_guild(ctx.guild.id))['logchannel']
+            chan = await dbcontrol.get_setting(ctx.guild.id, 'logchannel')
             channel = ctx.guild.get_channel(chan)
             await ctx.send(f"**The current log channel is ``{channel.name}``**" if chan else ":x: **No log channel found**")
 
@@ -42,7 +42,7 @@ class Settings(commands.Cog):
     @settings.command(brief="Sets the channel for announcements.", usage='[channel]')
     async def announcechannel(self, ctx, channel: discord.TextChannel = None):
         if channel is not None:
-            await dbcontrol.modify_guild(ctx.guild.id, "announcechannel", channel.id)
+            await dbcontrol.modify_setting(ctx.guild.id, "announcechannel", channel.id)
             await ctx.send(f":white_check_mark: **Announcement channel set to ``{channel.name}``**")
         else:
             chan = (await dbcontrol.get_guild(ctx.guild.id))['announcechannel']
@@ -56,7 +56,7 @@ class Settings(commands.Cog):
             if role > ctx.guild.me.top_role:
                 await ctx.send(":x: **This muterole is higher than my top role**")
                 return
-            await dbcontrol.modify_guild(ctx.guild.id, "muterole", role.id)
+            await dbcontrol.modify_setting(ctx.guild.id, "muterole", role.id)
             await ctx.send("The muterole has been set to " + role.mention)
         else:
             muteRole = (await dbcontrol.get_guild(ctx.guild.id))['muterole']

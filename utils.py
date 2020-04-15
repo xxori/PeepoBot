@@ -10,6 +10,7 @@ from collections import Counter
 from datetime import datetime
 import dbcontrol
 import json
+from colour import COLOURS
 
 class Cycle:
     def __init__(self, elements):
@@ -109,12 +110,12 @@ def hex(num: str):
     try:
         hex = int(num, base=16)
         if hex < 0:
-            return "Invalid"
+            return None
         if len(num) > 6:
-            return "Invalid"
+            return None
         return hex
     except:
-        return "Invalid"
+        return None
 
 async def check(bot):
     while bot.initialization_finished and bot.is_ready():
@@ -149,3 +150,13 @@ async def check(bot):
             coloursJSON = json.dumps(coloursDict)
             await dbcontrol.modify_guild(guildid, 'colours', coloursJSON)
             await asyncio.sleep(30)
+
+def colour(colour):
+    colourHex = hex(colour.replace("#", ""))
+    if colourHex != None:
+        colour = discord.Colour(colourHex)
+    elif colour.lower() in COLOURS.keys():
+        colour = discord.Colour(hex(COLOURS[colour.lower()]))
+    else:
+        return False
+    return colour
