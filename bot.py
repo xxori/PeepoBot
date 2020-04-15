@@ -18,7 +18,6 @@ import aiohttp
 class Peepo(commands.AutoShardedBot):
     def __init__(self, logger, config):
         super(Peepo, self).__init__(command_prefix=commands.when_mentioned_or(';'))
-        self.SERVER = 697048716757958666
         self.logger = logger
         self.config = config
         self.command_prefix = ";"
@@ -93,33 +92,12 @@ class Peepo(commands.AutoShardedBot):
 
             await super().on_message(message)
 
-    async def on_member_join(self, member):
-        announcechan = (await dbcontrol.get_guild(self.SERVER))['announcechannel']
-        defaultrole = (await dbcontrol.get_guild(self.SERVER))['defaultrole']
-        serv = self.get_guild(self.SERVER)
-        if defaultrole:
-            role = serv.get_role(defaultrole)
-            await member.add_roles(role, reason="Default role assignment for new member")
-        if announcechan:
-            channel = serv.get_channel(announcechan)
-            embed = discord.Embed(title=f"Welcome, {member.name}", description=f"Welcome to {serv.name}!", color=discord.Color.blurple())
-            embed.set_thumbnail(url=member.avatar_url)
-            embed.set_footer(text=str(member), icon_url=member.avatar_url)
-            await channel.send(embed=embed)
-
-
     async def on_message_delete(self, message):
         self.snipe_list.append(message)
 
-    async def on_guild_join(self, guild):
-        if guild.id != self.SERVER:
-            if guild.system_channel:
-                await guild.system_channel.send("**This bot is only for use in PeepoLand**")
-            await guild.leave()
 
     async def on_ready(self):
         self.logger.info('Initializing database.')
-        
         await dbcontrol.initialize_tables(self)
 
         old_time = self.connect_time
@@ -131,44 +109,15 @@ class Peepo(commands.AutoShardedBot):
         #self.cb = utils.CleverBot()
         #await self.cb.init()
 
+        # Starting 30 second cycle for colours and mutes checking
+        self.logger.info("Starting role check loop")
+        self.loop.create_task(utils.check(self))
+
         self.logger.info(f'Started presence loop.')
         self.loop.create_task(self.presence_changer())
 
         self.logger.info('Marking initialization_finished.')
         self.initialization_finished = True
-        await self.check(self.SERVER)
-
-    async def check(self, guildid):
-        while self.initialization_finished and self.is_ready():
-            now = datetime.utcnow().timestamp()
-            mutesJSON = (await dbcontrol.get_guild(guildid))['tempmutes']
-            mutesDict = json.loads(mutesJSON)
-            guild = self.get_guild(guildid)
-            muteroleid = (await dbcontrol.get_guild(guildid))['muterole']
-            muterole = guild.get_role(muteroleid)
-            for i in list(mutesDict.keys()):
-                if mutesDict[i] < now:
-                    mutesDict.pop(i)
-                    user = guild.get_member(int(i))
-                    await user.remove_roles(muterole, reason="Tempmute expired")
-            mutesJSON = json.dumps(mutesDict)
-            await dbcontrol.modify_guild(guildid, 'tempmutes', mutesJSON)
-
-            coloursJSON = (await dbcontrol.get_guild(guildid))['colours']
-            coloursDict = json.loads(coloursJSON)
-            for colour in list(coloursDict.keys()):
-                used = False
-                role = guild.get_role(coloursDict[colour])
-                for member in guild.members:
-                    if role in member.roles:
-                        used = True
-                if not used:
-                    await role.delete(reason="Automated colour role removal, no users have role")
-                    coloursDict.pop(colour)
-            coloursJSON = json.dumps(coloursDict)
-            await dbcontrol.modify_guild(guildid, 'colours', coloursJSON)
-
-            await asyncio.sleep(30)
 
     async def presence_changer(self):
         possible = [discord.Game(name=i) for i in self.presences]
@@ -182,8 +131,8 @@ class Peepo(commands.AutoShardedBot):
                 await asyncio.sleep(20)
 
     async def log(self, guild, message):
-        logchannel = (await dbcontrol.get_guild(guild.id))['logchannel']
-        if announcechannel ==  "":
+        logchannel = await dbcontrol.get_setting(id, settings)
+        if logchannel ==  "":
             return
         channel = guild.get_channel(logchannel)
         await channel.send(f"[{datetime.utcnow().strptime('%d/%m/y %H:%M')} UTC] " + str(message))

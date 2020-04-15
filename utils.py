@@ -7,6 +7,9 @@ import asyncio
 from functools import wraps
 import re
 from collections import Counter
+from datetime import datetime
+import dbcontrol
+import json
 
 class Cycle:
     def __init__(self, elements):
@@ -112,3 +115,37 @@ def hex(num: str):
         return hex
     except:
         return "Invalid"
+
+async def check(bot):
+    while bot.initialization_finished and bot.is_ready():
+        for guild in bot.guilds:
+            guildid = guild.id
+            now = datetime.utcnow().timestamp()
+            mutesJSON = (await dbcontrol.get_guild(guildid))['tempmutes']
+            mutesDict = json.loads(mutesJSON)
+
+            muteroleid = await dbcontrol.get_setting(guildid,'muterole')
+            muterole = guild.get_role(muteroleid)
+            for i in list(mutesDict.keys()):
+                if mutesDict[i] < now:
+                    mutesDict.pop(i)
+                    user = guild.get_member(int(i))
+                    if muterole:
+                        await user.remove_roles(muterole, reason="Tempmute expired")
+            mutesJSON = json.dumps(mutesDict)
+            await dbcontrol.modify_guild(guildid, 'tempmutes', mutesJSON)
+
+            coloursJSON = (await dbcontrol.get_guild(guildid))['colours']
+            coloursDict = json.loads(coloursJSON)
+            for colour in list(coloursDict.keys()):
+                used = False
+                role = guild.get_role(coloursDict[colour])
+                for member in guild.members:
+                    if role in member.roles:
+                        used = True
+                if not used:
+                    await role.delete(reason="Automated colour role removal, no users have role")
+                    coloursDict.pop(colour)
+            coloursJSON = json.dumps(coloursDict)
+            await dbcontrol.modify_guild(guildid, 'colours', coloursJSON)
+            await asyncio.sleep(30)

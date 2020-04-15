@@ -19,7 +19,7 @@ async def initialize_tables(bot):
     c = await get_connector()
     await c.execute('CREATE TABLE IF NOT EXISTS users(id INTEGER, seen_in TEXT, settings TEXT, bio TEXT, image_url TEXT, profile_color INTEGER, blacklist INTEGER)')
     await c.execute('CREATE TABLE IF NOT EXISTS tags(author INTEGER, guild INTEGER, created REAL, name TEXT, content TEXT)')
-    await c.execute('CREATE TABLE IF NOT EXISTS guilds(id INTEGER, prefix TEXT, logchannel INTEGER, muterole INTEGER, announcechannel INTEGER, defaultrole INTEGER, roles TEXT, tempmutes TEXT, colours TEXT)')
+    await c.execute('CREATE TABLE IF NOT EXISTS guilds(id INTEGER, settings TEXT, roles TEXT, tempmutes TEXT, colours TEXT)')
 
     bot.logger.info('Rebuilding guild database.')
     await rebuild_guilds(bot)
@@ -46,7 +46,10 @@ async def rebuild_guilds(bot):
         data = await cursor.fetchone()
 
         if not data:
-            await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', (str(guild.id), '$', '', '', '', '', '{}', '[]'))
+            if guild.system_channel:
+                await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', (str(guild.id), '{"prefix": "' + {bot.command_prefix} + '", "announcechannel": ' + {guild.system_channel} + '}', '{}', '{}', "{}"))
+            else:
+                await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', (str(guild.id), '{"prefix": "' + {bot.command_prefix} + '"}', '{}', '{}', "{}"))
 
     await c.commit()
     await c.close()
@@ -177,3 +180,11 @@ async def is_blacklist(id):
         bl = False
     await c.close()
     return bl
+
+async def get_setting(id, setting):
+    settingsJSON = (await get_guild(id))['settings']
+    settingsDict = json.loads(settingsJSON)
+    if setting in settingsDict.keys():
+        return settingsDict[setting]
+    else:
+        return None
