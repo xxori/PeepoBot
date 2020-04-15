@@ -75,7 +75,7 @@ class Fun(commands.Cog):
     @commands.command(brief="Sends a peepee picture(nsfw channels only)")
     async def peepee(self, ctx):
         embed = discord.Embed(description="As promised [https://imgur.com/gallery/SYyT2Nf](http://bitly.com/98K8eH)", colour=discord.Colour.blurple(), timestamp=datetime.datetime.utcnow())
-        embed.set_thumbnail(text=ctx.author, url=ctx.author.avatar_url)
+        embed.set_footer(text=ctx.author, url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
 
