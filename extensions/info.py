@@ -170,7 +170,9 @@ class Utility(commands.Cog):
 
         colour = utils.colour(colour)
 
-        if colour:
+        if not colour:
+            await ctx.send(":x: **Invalid Colour**")
+        else:
             for key in list(coloursDict.keys()):
                 role = ctx.guild.get_role(coloursDict[str(key)])
                 if role is None:
@@ -184,7 +186,7 @@ class Utility(commands.Cog):
             if str(colour.value) in list(coloursDict.keys()):
                 role = ctx.guild.get_role(coloursDict[str(colour.value)])
                 if role > ctx.guild.me.top_role:
-                    return await ctx.send(":x: **I don't have permission to give you thata role**")
+                    return await ctx.send(":x: **I don't have permission to give you that role**")
                 if role in ctx.author.roles:
                     return await ctx.send(":x: **You already have this role**")
                 await ctx.author.add_roles(role, reason="Automated colour command")

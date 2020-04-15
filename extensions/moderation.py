@@ -174,21 +174,24 @@ class Moderation(commands.Cog):
         muteroleid = await dbcontrol.get_setting(ctx.guild.id, 'muterole')
         muterole = ctx.guild.get_role(muteroleid)
         if muterole is None:
-            return await ctx.send(f":x: **The current muterole is invalid**")
+            await ctx.send(f":x: **The current muterole is invalid**")
 
         if muterole > ctx.guild.me.top_role:
             await ctx.send(f":x: **The current muterole is higher than my highest role**")
 
         elif ctx.guild.owner_id == user.id:
             await ctx.send(f':x: **You cannot mute ``{user}`` because they are the server owner.**')
-            return
+
 
         elif (user.top_role >= ctx.author.top_role) and ctx.guild.owner_id != ctx.author.id:
             await ctx.send(f':x: **You are not authorised to mute ``{user}``.**')
-            return
 
-        elif target.top_role > muterole:
+
+        elif user.top_role > muterole:
             await ctx.send(f':x: **``{user}`` has the role ``{user.top_role.name}`` which overrides permissions of the muterole**')
+
+        elif user == ctx.guild.me:
+            await ctx.send("Frick off, hecker")
 
         else:
             await user.add_roles(muterole, reason=f"{ctx.author}:" + f":{time}{unit}")
