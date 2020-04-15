@@ -11,11 +11,11 @@ class Settings(commands.Cog):
     def description(self):
         return "Server settings command for administrators only"
 
-    @commands.group(invoke_without_command=True, brief=f"Server settings. {self.bot.command_prefix}help settings for more", usage="[subcommand] <argument>")
+    @commands.group(invoke_without_command=True, brief=f"Server settings category of commands", usage="[subcommand] <argument>")
     async def settings(self, ctx):
         settingsJSON = await dbcontrol.get_guild(ctx.guild.id)['settings']
 
-    @commands.has_permissions(manage_server=True)
+    @commands.has_permissions(manage_roles=True)
     @settings.command(brief="Sets the default role for new users", usage='[role]')
     async def defaultrole(self, ctx, role: discord.Role = None):
         if role is not None:

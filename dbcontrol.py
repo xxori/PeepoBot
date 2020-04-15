@@ -47,9 +47,9 @@ async def rebuild_guilds(bot):
 
         if not data:
             if guild.system_channel:
-                await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', (str(guild.id), '{"prefix": "' + {bot.command_prefix} + '", "announcechannel": ' + {guild.system_channel} + '}', '{}', '{}', "{}"))
+                await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', (str(guild.id), '{"prefix": "' + bot.command_prefix + '", "announcechannel": ' + str(guild.system_channel.id) + '}', '{}', '{}', "{}"))
             else:
-                await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', (str(guild.id), '{"prefix": "' + {bot.command_prefix} + '"}', '{}', '{}', "{}"))
+                await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', (str(guild.id), '{"prefix": "' + bot.command_prefix + '"}', '{}', '{}', "{}"))
 
     await c.commit()
     await c.close()
