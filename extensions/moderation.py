@@ -203,7 +203,7 @@ class Moderation(commands.Cog):
         mutesDict = json.loads(mutesJSON)
         if mutesDict in [{}, ""]:
             return await ctx.send("**There are currently no members temp muted**")
-        embed = discord.Embed(title=f"Tempmutes in {ctx.guild.name}", color=discord.Color.blurple())
+        embed = discord.Embed(title=f"Tempmutes in {ctx.guild.name}", color=discord.Color.blurple(), timestamp=datetime.datetime.utcnow())
         for mute in list(mutesDict.keys()):
             user = ctx.guild.get_member(int(mute))
             diff = mutesDict[mute] - int(datetime.datetime.utcnow().timestamp())

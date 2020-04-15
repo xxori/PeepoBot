@@ -35,6 +35,7 @@ class Utility(commands.Cog):
         embed.add_field(name='Channels', value=f'{len(ctx.guild.text_channels)} text, {len(ctx.guild.voice_channels)} voice', inline=False)
         embed.add_field(name='Roles', value=str(len(ctx.guild.roles)), inline=False)
         embed.add_field(name='Region', value=str(ctx.guild.region).capitalize(), inline=False)
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
 
 
         embed.set_thumbnail(url=ctx.guild.icon_url)
@@ -44,13 +45,14 @@ class Utility(commands.Cog):
     async def uinfo(self, ctx, user: discord.Member = None):
         if not user:
             user = ctx.message.author
-        embed = discord.Embed(color=user.color)
+        embed = discord.Embed(color=user.color if user.color else discord.Colour.blurple(), timestamp=datetime.datetime.utcnow())
         embed.set_author(name=f'User Info')
         embed.add_field(name='Name', value=str(user), inline=False)
         embed.add_field(name='ID', value=user.id, inline=False)
         embed.add_field(name='Highest role', value=user.top_role, inline=False)
         embed.add_field(name='Joined Server', value=user.joined_at.strftime('%A %d %B %Y at %I:%M %p (UTC)'), inline=False)
         embed.add_field(name='Account Created', value=user.created_at.strftime('%A %d %B %Y at %I:%M %p (UTC)'), inline=False)
+        embed.set_footer(text=user, icon_url=user.avatar_url)
         embed.set_thumbnail(url=user.avatar_url)
         if user.nick != None:
             embed.add_field(name='Nickname: ', value=user.nick, inline=False)
@@ -65,8 +67,8 @@ class Utility(commands.Cog):
     async def botinfo(self, ctx):
         runtime = datetime.datetime.utcnow() - self.bot.run_time
         uptime = datetime.datetime.utcnow() - self.bot.connect_time
-        embed = discord.Embed(colour=discord.Colour.blurple())
-
+        embed = discord.Embed(colour=discord.Colour.blurple(), timestamp=datetime.datetime.utcnow())
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
         embed.set_author(name=str(self.bot.user), icon_url=self.bot.user.avatar_url)
 
         embed.add_field(name='Uptime', value=f'''
@@ -103,7 +105,7 @@ class Utility(commands.Cog):
             embed.add_field(name='Fact of the Day', value=value, inline=False)
         else:
             async with aiohttp.ClientSession(loop=self.bot.loop) as session:
-                response = await session.get(url='https://sv443.net/jokeapi/category/Any?blacklistFlags=nsfw')
+                response = await session.get(url='https://sv443.net/jokeapi/v2/joke/Any?blacklistFlags=nsfw')
                 data = await response.json()
                 await session.close()
             if data['type'] == 'twopart':
@@ -124,7 +126,8 @@ class Utility(commands.Cog):
             if msg.guild == ctx.message.guild:
                 snipes_serv.append(msg)
 
-        embed = discord.Embed(title=f"Deleted messages from {ctx.message.guild.name}")
+        embed = discord.Embed(title=f"Deleted messages from {ctx.message.guild.name}", timestamp=datetime.datetime.utcnow())
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
         if len(snipes_serv):
             for msg in snipes_serv:
                 embed.add_field(name=f"{msg.author}", value=msg.content, inline=False)

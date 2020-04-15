@@ -32,8 +32,8 @@ class Profiles(commands.Cog):
                 color=color if color else user.color,
                 description=bio if len(bio) else f"Hi! I'm {user.name}, nice to meet you!"
             )
-
-            embed.set_author(name=f'{user}', icon_url=user.avatar_url)
+            embed.timestamp = datetime.datetime.utcnow()
+            embed.set_footer(text=f"{user}'s profile", icon_url=user.avatar_url)
             if len(image_url):
                 try:
                     embed.set_image(url=image_url)

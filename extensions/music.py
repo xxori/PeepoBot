@@ -4,6 +4,7 @@ import asyncio
 import youtube_dl as yt
 from urllib import request
 import utils
+import datetime
 
 YOUTUBEDL_OPTIONS = {
     "default_search": "ytsearch",
@@ -39,8 +40,7 @@ class Video:
 
     def get_embed(self):
         """Makes an embed out of this Video's information."""
-        embed = discord.Embed(
-            title=self.title, description=self.uploader, url=self.video_url)
+        embed = discord.Embed(title=self.title, description=self.uploader, url=self.video_url, timestamp=datetime.datetime.utcnow())
         embed.set_footer(
             text=f"Requested by {self.requested_by.name}",
             icon_url=self.requested_by.avatar_url)

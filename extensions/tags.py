@@ -52,7 +52,7 @@ class Tags(commands.Cog):
             return
         author = self.bot.get_user(tag['author'])
 
-        embed = discord.Embed(colour=discord.Colour.blurple())
+        embed = discord.Embed(colour=discord.Colour.blurple(), timestamp=datetime.datetime.utcnow())
         embed.set_author(name=f'Tag: {name}', icon_url=author.avatar_url)
         embed.add_field(name='Created by', value=str(author))
         embed.add_field(name='Created on', value=datetime.datetime.fromtimestamp(tag['created']).strftime('%A %d %B %Y at %I:%M %p (UTC)'), inline=False)
