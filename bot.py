@@ -73,6 +73,7 @@ class Peepo(commands.AutoShardedBot):
         self.logger.info(f'Running duration: {utils.strfdelta(runtime, "%Dd %Hh %Mm %Ss")}')
         #self.logger.info('Closing cleverbot session...')
         #asyncio.get_event_loop().run_until_complete(self.cb.close())
+        self.session.close()
         self.logger.info('Bot has shut down successfully.')
 
     # events
