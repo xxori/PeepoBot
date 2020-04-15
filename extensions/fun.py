@@ -5,7 +5,7 @@ import dbcontrol
 import random
 import utils
 import datetime
-
+import json
 
 class Fun(commands.Cog):
     def __init__(self, bot):
@@ -18,10 +18,9 @@ class Fun(commands.Cog):
     @commands.command(brief='Defines with Urban Dictionary', aliases=['dict', 'ud'], usage='[term]')
     async def urban(self, ctx, *, term):
         async with ctx.typing():
-            async with aiohttp.ClientSession(loop=self.bot.loop) as session:
+            async with self.bot.session as session:
                 response = await session.get(url='http://api.urbandictionary.com/v0/define', params={'term': term})
                 data = await response.json()
-                await session.close()
             if len(data['list']) == 0:
                 embed = discord.Embed(description='No Results Found!', color=0xFF0000)
                 await ctx.send(embed=embed)
@@ -36,14 +35,43 @@ class Fun(commands.Cog):
     @commands.command(brief='Shows posts from the dankmemes subreddit', aliases=['dankmemes'])
     async def meme(self, ctx):
         async with ctx.typing():
-            async with aiohttp.ClientSession(loop=self.bot.loop) as session:
+            async with self.bot.session as session:
                 response = await session.get(url='https://meme-api.herokuapp.com/gimme/dankmemes')
                 data = await response.json()
-                await session.close()
             embed = discord.Embed(title=data['title'], timestamp=datetime.datetime.utcnow())
             embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
             embed.set_image(url=data['url'])
             await ctx.send(embed=embed)
+
+    @commands.command(brief="Gets a random dog", usage="[breed or empty fof random]", description="All breeds available at https://dog.ceo/dog-api/breeds-list")
+    async def dog(self, ctx, breed=None):
+        if breed is None:
+            async with self.bot.session.get("https://dog.ceo/api/breeds/image/random") as response:
+                if response.status != 200:
+                    return await ctx.send(":x: **Dog not found**")
+                body = await response.json()
+        else:
+            async with self.bot.session.get(f"https://dog.ceo/api/breed/{breed}/images/random") as response:
+                if response.status != 200:
+                    return await ctx.send(":x: **Dog not found :(**")
+                body = await response.json()
+
+        embed = discord.Embed(colour=discord.Colour.blurple(), timestamp=datetime.datetime.utcnow())
+        embed.set_image(url=body['message'])
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=embed)
+
+    @commands.command(brief="Gets a random cat")
+    async def cat(self, ctx):
+        async with self.bot.session.get("https://api.thecatapi.com/v1/images/search") as response:
+            if response.status != 200:
+                return await ctx.send(":x: **No cat found :(**")
+            body = await response.json()
+        embed = discord.Embed(colour=discord.Colour.blurple(), timestamp=datetime.datetime.utcnow())
+        embed.set_image(url=body[0]['url'])
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Fun(bot))

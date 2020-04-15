@@ -27,6 +27,7 @@ class Peepo(commands.AutoShardedBot):
         self.presences = []
         self.presence_looping = True
         self.module_directories = ['extensions']
+
         self.snipe_list = []
         # USE THIS INSTEAD OF IS_READY!!!!!!!!! DATABASE ISSUES
         self.initialization_finished = False
@@ -108,7 +109,7 @@ class Peepo(commands.AutoShardedBot):
         #self.logger.info('Starting cleverbot session...')
         #self.cb = utils.CleverBot()
         #await self.cb.init()
-
+        self.session = aiohttp.ClientSession(loop=self.loop)
         # Starting 30 second cycle for colours and mutes checking
         self.logger.info("Starting role check loop")
         self.loop.create_task(utils.check(self))
