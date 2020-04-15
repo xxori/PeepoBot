@@ -3,7 +3,9 @@ from discord.ext import commands
 import asyncio
 import traceback
 import utils
-class ErrorHandler(commands.Cog):
+import dbcontrol
+
+class EventHandler(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -65,6 +67,21 @@ class ErrorHandler(commands.Cog):
         else:
             await ctx.send(f':x: **An internal error has occurred.** ```py\n{type(e)}: {e}```')
             traceback.print_exception(type(e), e, e.__traceback__)
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        serv = member.guild
+        defaultrole = await dbcontrol.get_setting(serv.id, 'defaultrole')
+        announcechan = await dbcontrol.get_setting(serv.id, 'announcechannel')
+        if defaultrole:
+            role = serv.get_role(defaultrole)
+            await member.add_roles(role, reason="Default role assignment for new member")
+        if announcechan:
+            channel = serv.get_channel(announcechan)
+            embed = discord.Embed(title=f"Welcome, {member.name}", description=f"Welcome to {serv.name}!", color=discord.Color.blurple())
+            embed.set_thumbnail(url=member.avatar_url)
+            embed.set_footer(text=str(member), icon_url=member.avatar_url)
+            await channel.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(

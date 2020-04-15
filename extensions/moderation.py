@@ -65,7 +65,7 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     @commands.command(brief='Mutes a server member', usage='[user] <reason>')
     async def mute(self, ctx, target: discord.Member, *, reason=None):
-        muteRole = (await dbcontrol.get_guild(ctx.guild.id))['muterole']
+        muteRole = await dbcontrol.get_setting(ctx.guild.id, 'muterole')
         if muteRole is None:
             await ctx.send(f':x: **A muterole is required for this command to run. Please assign a muterole with {self.bot.prefix}muterole**')
             return
@@ -98,7 +98,7 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     @commands.command(brief='Unmutes a server member', usage='[user]', aliases=['umute'])
     async def unmute(self, ctx, target: discord.Member):
-        muteID = (await dbcontrol.get_guild(ctx.guild.id))['muterole']
+        muteID = await dbcontrol.get_setting(ctx.guild.id, 'muterole')
         mutesJSON = (await dbcontrol.get_guild(ctx.guild.id))['tempmutes']
         mutesDict = json.loads(mutesJSON)
 
@@ -118,21 +118,6 @@ class Moderation(commands.Cog):
             await ctx.send(f':thumbsup: **Unmuted ``{target}``**')
         else:
             await ctx.send(f':x: **``{target}`` is not muted.**')
-
-    @commands.bot_has_permissions(manage_roles=True)
-    @commands.has_permissions(manage_roles=True)
-    @commands.command(brief="Assigns a muterole for the mute and unmute commands", usage="[role]")
-    async def muterole(self, ctx, role: discord.Role = None):
-        if role is not None:
-            if role > ctx.guild.me.top_role:
-                await ctx.send(":x: **This muterole is higher than my top role**")
-                return
-            await dbcontrol.modify_guild(ctx.guild.id, "muterole", role.id)
-            await ctx.send("The muterole has been set to " + role.mention)
-        else:
-            muteRole = (await dbcontrol.get_guild(ctx.guild.id))['muterole']
-            role = ctx.guild.get_role(muteRole)
-            await ctx.send(f"**The current muterole is ``{role.name}``**" if muteRole else ":x: **No muterole found**")
 
     @commands.has_permissions(manage_channels=True)
     @commands.command(brief='Execute command as another user.', usage='[user] <command>', aliases=['runas', 'please'])
@@ -157,40 +142,6 @@ class Moderation(commands.Cog):
         sudo_msg.content = ctx.prefix + cmd.replace(ctx.prefix, '', 1)
         sudo_ctx = await self.bot.get_context(sudo_msg)
         await self.bot.invoke(sudo_ctx)
-
-    @commands.has_permissions(manage_roles=True)
-    @commands.command(brief="Sets the channel for announcements.", usage='[channel]')
-    async def announcechannel(self, ctx, channel: discord.TextChannel = None):
-        if channel is not None:
-            await dbcontrol.modify_guild(ctx.guild.id, "announcechannel", channel.id)
-            await ctx.send(f":white_check_mark: **Announcement channel set to ``{channel.name}``**")
-        else:
-            chan = (await dbcontrol.get_guild(ctx.guild.id))['announcechannel']
-            channel = ctx.guild.get_channel(chan)
-            await ctx.send(f"**The current announcements channel is ``{channel.name}``**" if chan else ":x: **No announcement channel found**")
-
-    @commands.has_permissions(manage_roles=True)
-    @commands.command(brief="Sets the channel for logging.", usage='[channel]')
-    async def logchannel(self, ctx, channel: discord.TextChannel = None):
-        if channel is not None:
-            await dbcontrol.modify_guild(ctx.guild.id, "logchannel", channel.id)
-            await  ctx.send(f":white_check_mark: **Log channel set to ``{channel.name}``**")
-        else:
-            chan = (await dbcontrol.get_guild(ctx.guild.id))['logchannel']
-            channel = ctx.guild.get_channel(chan)
-            await ctx.send(f"**The current log channel is ``{channel.name}``**" if chan else ":x: **No log channel found**")
-
-    @commands.has_permissions(manage_channels=True)
-    @commands.command(brief="Sets the default role for new users", usage='[role]')
-    async def defaultrole(self, ctx, role: discord.Role = None):
-        if role is not None:
-            await dbcontrol.modify_guild(ctx.guild.id, "defaultrole", role.id)
-            await ctx.send(f":white_check_mark: **Default role set to ``{role.name}``**")
-        else:
-            rol = (await dbcontrol.get_guild(ctx.guild.id))['defaultrole']
-            role = ctx.guild.get_role(rol)
-            await ctx.send(f"**The current default role is ``{role.name}``**" if rol else ":x: **No default role found**")
-
 
     @commands.has_permissions(manage_roles=True)
     @commands.command(brief='Adds a role for people to add to themselves with the role command', usage="[name] <role>")
@@ -220,7 +171,7 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     @commands.command(brief='Temporarily mutes a user', usage='[user] <minutes>', aliases=["tmute"])
     async def tempmute(self, ctx, user: discord.Member, time: int, unit = "s", reason=None):
-        muteroleid = (await dbcontrol.get_guild(ctx.guild.id))['muterole']
+        muteroleid = await dbcontrol.get_setting(ctx.guild.id, 'muterole')
         muterole = ctx.guild.get_role(muteroleid)
         if muterole is None:
             return await ctx.send(f":x: **The current muterole is invalid**")

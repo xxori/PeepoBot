@@ -13,7 +13,7 @@ class Tags(commands.Cog):
     def description(self):
         return 'Tag-related commands'
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, brief="Category for commands related to tags", usage="[subcommand] <arguments>")
     async def tag(self, ctx, *, name):
         if ctx.invoked_subcommand is None:
             tag = await dbcontrol.get_guild_tag(ctx.guild.id, name)
