@@ -184,7 +184,7 @@ class Moderation(commands.Cog):
             return
 
         elif (user.top_role >= ctx.author.top_role) and ctx.guild.owner_id != ctx.author.id:
-            await ctx.send(f':x: **You are not authorised to mute ``{usr}``.**')
+            await ctx.send(f':x: **You are not authorised to mute ``{user}``.**')
             return
 
         elif target.top_role > muterole:
