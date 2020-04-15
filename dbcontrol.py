@@ -188,3 +188,10 @@ async def get_setting(id, setting):
         return settingsDict[setting]
     else:
         return None
+
+async def modify_setting(id, setting, value):
+    settingsJSON = (await get_guild(id))['settings']
+    settingsDict = json.loads(settingsJSON)
+    settingsDict[setting] = value
+    settingsJSON = json.dumps(settingsDict)
+    await modify_guild(id, 'settings', settingsJSON)
