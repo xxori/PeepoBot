@@ -9,7 +9,6 @@ A fork of GTXBot, our old bot developed by me and Codian, modified for different
 + ``discord.py``
 + ``aiosqlite``
 + ``youtube-dl``
-+ ``epicbox``
 
 1. Install ``python`` package different for each distro)
 
@@ -21,7 +20,7 @@ A fork of GTXBot, our old bot developed by me and Codian, modified for different
     ```
     # apt install python3
     ```
-    RHEL/Centos
+    RHEL/Centos/Fedora
     ```
     # yum install python3
     ```
@@ -40,46 +39,8 @@ A fork of GTXBot, our old bot developed by me and Codian, modified for different
     ```
     # python3 -m pip install -r requirements.txt
     ```
-
 ---
-##### Set up Docker (for safe code execution)
 
-1. Install `docker` package (different for each distro)
-
-    Arch/Manjaro
-    ```
-    # pacman -S docker
-    ```
-    Ubuntu/Debian/Mint
-    ```
-    # apt install docker
-    ```
-    RHEL/CentOS
-    ```
-    # yum install docker
-    ```
-
-2. Run ``docker`` install script
-    ```
-    # curl -sSL https://get.docker.com/ | sh
-    ```
-3. Set up the ``docker`` image:
-    
-   The below commands assume your username is ``john``
-   
-   Add yourself to the ``docker`` group
-   ```
-   # usermod -aG docker john
-   ```
-   Reload system groups (or alternatively ``reboot``)
-   ```
-   # newgrp
-   ```
-   Pull the ``python:latest`` docker image
-   ```
-   $ docker pull python:latest
-   ```
- ---
  ##### Running PeepoBot
  
 Simply run the ``bot.py`` file with ``python3`` to begin the startup process.
