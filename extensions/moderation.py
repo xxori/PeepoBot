@@ -175,27 +175,41 @@ class Moderation(commands.Cog):
         muterole = ctx.guild.get_role(muteroleid)
         if muterole is None:
             return await ctx.send(f":x: **The current muterole is invalid**")
-        if muterole > ctx.guild.me.top_role:
-            return await ctx.send(f":x: **The current muterole is higher than my highest role**")
-        await user.add_roles(muterole, reason=f"{ctx.author}:" + f":{time}{unit}")
-        await ctx.send(f":white_check_mark:** User {user} temporarily muted for {time}{unit}**")
-        mutesJSON = (await dbcontrol.get_guild(ctx.guild.id))['tempmutes']
-        mutesDict = json.loads(mutesJSON) or {}
-        if unit.lower() in ["m", "minutes", "minute"]:
-            time *= 60
-        if unit.lower() in ["h", "hours", "hour"]:
-            time *= 3600
-        mutesDict[user.id] = int(datetime.datetime.utcnow().timestamp()) + time
-        mutesJSON = json.dumps(mutesDict)
-        await dbcontrol.modify_guild(ctx.guild.id, 'tempmutes', mutesJSON)
 
-        await asyncio.sleep(time)
-        mutesJSON = (await dbcontrol.get_guild(ctx.guild.id))['tempmutes']
-        mutesDict = json.loads(mutesJSON)
-        if user.id in mutesDict.keys():
-            mutesDict.pop(user.id)
-        if muterole in user.roles:
-            await user.remove_roles(muterole, reason="Tempmute expired")
+        if muterole > ctx.guild.me.top_role:
+            await ctx.send(f":x: **The current muterole is higher than my highest role**")
+
+        elif ctx.guild.owner_id == user.id:
+            await ctx.send(f':x: **You cannot mute ``{user}`` because they are the server owner.**')
+            return
+
+        elif (user.top_role >= ctx.author.top_role) and ctx.guild.owner_id != ctx.author.id:
+            await ctx.send(f':x: **You are not authorised to mute ``{usr}``.**')
+            return
+
+        elif target.top_role > muterole:
+            await ctx.send(f':x: **``{user}`` has the role ``{user.top_role.name}`` which overrides permissions of the muterole**')
+
+        else:
+            await user.add_roles(muterole, reason=f"{ctx.author}:" + f":{time}{unit}")
+            await ctx.send(f":white_check_mark:** User {user} temporarily muted for {time}{unit}**")
+            mutesJSON = (await dbcontrol.get_guild(ctx.guild.id))['tempmutes']
+            mutesDict = json.loads(mutesJSON) or {}
+            if unit.lower() in ["m", "minutes", "minute"]:
+                time *= 60
+            if unit.lower() in ["h", "hours", "hour"]:
+                time *= 3600
+            mutesDict[user.id] = int(datetime.datetime.utcnow().timestamp()) + time
+            mutesJSON = json.dumps(mutesDict)
+            await dbcontrol.modify_guild(ctx.guild.id, 'tempmutes', mutesJSON)
+
+            await asyncio.sleep(time)
+            mutesJSON = (await dbcontrol.get_guild(ctx.guild.id))['tempmutes']
+            mutesDict = json.loads(mutesJSON)
+            if user.id in mutesDict.keys():
+                mutesDict.pop(user.id)
+            if muterole in user.roles:
+                await user.remove_roles(muterole, reason="Tempmute expired")
 
     @commands.command(brief="Checks all tempmuted users", usage="[user]", aliases=["listmutes", "listmute"])
     async def checkmute(self, ctx, user: discord.Member = None):
