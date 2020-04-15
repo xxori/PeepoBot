@@ -85,5 +85,5 @@ class EventHandler(commands.Cog):
 
 def setup(bot):
     bot.add_cog(
-        ErrorHandler(bot)
+        EventHandler(bot)
     )
