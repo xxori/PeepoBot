@@ -156,7 +156,7 @@ async def run_command(command):
 
 async def delete_tag(author, guild, name):
     c = await get_connector()
-    await c.execute(f'DELETE FROM tags WHERE author = ? AND name = ? AND guild = ?', author, name, guild)
+    await c.execute(f'DELETE FROM tags WHERE author = ? AND name = ? AND guild = ?', (author, name, guild))
     await c.commit()
     await c.close()
 
@@ -171,13 +171,16 @@ async def is_blacklist(id):
     c = await get_connector()
     cursor = await c.execute(f'SELECT * FROM users WHERE id = ' + str(id))
     data = await cursor.fetchone()
-    if 'blacklist' in data.keys():
-        if data['blacklist'] == 1:
-            bl = True
+    if data:
+        if 'blacklist' in data.keys():
+            if data['blacklist'] == 1:
+                bl = True
+            else:
+                bl = False
         else:
             bl = False
     else:
-        bl = False
+        b1 = False
     await c.close()
     return bl
 
