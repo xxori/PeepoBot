@@ -18,8 +18,7 @@ class Fun(commands.Cog):
     @commands.command(brief='Defines with Urban Dictionary', aliases=['dict', 'ud'], usage='[term]')
     async def urban(self, ctx, *, term):
         async with ctx.typing():
-            async with self.bot.session as session:
-                response = await session.get(url='http://api.urbandictionary.com/v0/define', params={'term': term})
+            async with self.bot.session.get(url='http://api.urbandictionary.com/v0/define', params={'term': term}) as response:
                 data = await response.json()
             if len(data['list']) == 0:
                 embed = discord.Embed(description='No Results Found!', color=0xFF0000)
@@ -35,8 +34,7 @@ class Fun(commands.Cog):
     @commands.command(brief='Shows posts from the dankmemes subreddit', aliases=['dankmemes'])
     async def meme(self, ctx):
         async with ctx.typing():
-            async with self.bot.session as session:
-                response = await session.get(url='https://meme-api.herokuapp.com/gimme/dankmemes')
+            async with self.bot.session.get(url='https://meme-api.herokuapp.com/gimme/dankmemes')  as response:
                 data = await response.json()
             embed = discord.Embed(title=data['title'], timestamp=datetime.datetime.utcnow())
             embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
