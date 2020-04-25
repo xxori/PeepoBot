@@ -1,3 +1,27 @@
+'''
+MIT License
+
+Copyright (c) 2020 Martin Velikov & Patrick Thompson
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+'''
+
 import discord
 from discord.ext import commands
 import asyncio
@@ -60,8 +84,7 @@ class HelpCommand(commands.HelpCommand):
 
         text = f'```asciidoc\n{cmd_info}\n* {cmd_desc}```'
 
-        await self.context.author.send(text)
-        await self.get_destination().send(f"{self.context.author.mention} :point_right: **Check your DM's!**")
+        await self.get_destination().send(text)
 
     async def send_group_help(self, cmd):
         cmd_name = "|".join(cmd.aliases) if len(cmd.aliases) else cmd.name
@@ -86,9 +109,7 @@ class HelpCommand(commands.HelpCommand):
             sub = ''
 
         text = f'```asciidoc\n{cmd_info}\n* {cmd_desc}{sub}```'
-
-        await self.context.author.send(text)
-        await self.get_destination().send(f"{self.context.author.mention} :point_right: **Check your DM's!**")
+        await self.get_destination().send(text)
 
     async def command_not_found(self, string):
         await self.get_destination().send(f":x: ``{string}`` isn't a command, check your spelling.")

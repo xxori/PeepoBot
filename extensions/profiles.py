@@ -1,3 +1,27 @@
+'''
+MIT License
+
+Copyright (c) 2020 Martin Velikov & Patrick Thompson
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+'''
+
 import discord
 from discord.ext import commands
 import asyncio
@@ -48,21 +72,21 @@ class Profiles(commands.Cog):
         colour = utils.colour(colour)
         if colour:
             await dbcontrol.modify_user(ctx.author.id, 'profile_color', colour.value)
-            await ctx.send(f":white_check_mark: **Profile color set to `{colour.value}`.**")
+            await ctx.send(f":thumbsup: **Profile color set to `{colour.value}`.**")
         else:
             await ctx.send(":x: **Invalid colour**")
 
     @profile.command(brief='Sets bio text on profile')
     async def bio(self, ctx, *, bio):
         await dbcontrol.modify_user(ctx.author.id, 'bio', bio)
-        await ctx.send(f':white_check_mark: **Bio successfully updated to** ```\n{bio}```')
+        await ctx.send(f':thumbsup: **Bio successfully updated to** ```\n{bio}```')
 
     @profile.command(brief='Sets image displayed on profile', usage='<image url or attachment>')
     async def image(self, ctx, url=None):
         if url == None and len(ctx.message.attachments):
             url = ctx.message.attachments[0].url
         await dbcontrol.modify_user(ctx.author.id, 'image_url', url)
-        await ctx.send(f":white_check_mark: **Profile image set to** ```\n{url}```")
+        await ctx.send(f":thumbsup: **Profile image set to** ```\n{url}```")
 
 def setup(bot):
     bot.add_cog(Profiles(bot))

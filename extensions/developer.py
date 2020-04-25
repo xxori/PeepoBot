@@ -1,3 +1,27 @@
+'''
+MIT License
+
+Copyright (c) 2020 Martin Velikov & Patrick Thompson
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+'''
+
 import discord
 from discord.ext import commands
 import asyncio
@@ -22,7 +46,7 @@ class Developer(commands.Cog):
     async def reload(self, ctx, cog):
         self.bot.reload_extension(f'extensions.{cog}')
         self.bot.logger.info(f"Cog {cog} reloaded by {ctx.message.author} ({ctx.message.author.id})")
-        await ctx.send(f":white_check_mark: **Extension ``{cog}`` successfully reloaded**")
+        await ctx.send(f":thumbsup: **Extension ``{cog}`` successfully reloaded**")
 
     @commands.check(utils.is_developer)
     @commands.command(brief='Die bitch', aliases=['die', 'fuckoff'], hidden=True)
@@ -48,14 +72,14 @@ class Developer(commands.Cog):
     async def load(self, ctx, cog):
         self.bot.load_extension(f'extensions.{cog}')
         self.bot.logger.info(f"Cog {cog} loaded by {ctx.message.author} ({ctx.message.author.id})")
-        await ctx.send(f":white_check_mark: **Extension ``{cog}`` successfully loaded**")
+        await ctx.send(f":thumbsup: **Extension ``{cog}`` successfully loaded**")
 
     @commands.check(utils.is_developer)
     @commands.command(brief='Unloads a loaded extension', aliases=['uload'], usage='[cog]', hidden=True)
     async def unload(self, ctx, cog):
         self.bot.unload_extension(f'extensions.{cog}')
         self.bot.logger.info(f"Cog {cog} unloaded by {ctx.message.author} ({ctx.message.author.id})")
-        await ctx.send(f":white_check_mark:** Extension ``{cog}`` successfully loadn't**")
+        await ctx.send(f":thumbsup: **Extension ``{cog}`` successfully loadn't**")
 
     @commands.check(utils.is_developer)
     @commands.command(brief='Runs an SQL command', aliases=['sequel', 'database', 'db'], usage='[sql command]', hidden=True)
@@ -72,7 +96,7 @@ class Developer(commands.Cog):
             await ctx.send(':x:**You cannot blacklist a developer**')
         else:
             await dbcontrol.modify_user(user.id, 'blacklist', 1)
-            await ctx.send(f':white_check_mark:**User {user} has been successfully blacklisted**')
+            await ctx.send(f':thumbsup:**User {user} has been successfully blacklisted**')
 
     @commands.check(utils.is_developer)
     @commands.command(hidden=True)
@@ -81,7 +105,7 @@ class Developer(commands.Cog):
             await ctx.send(f':x:**User {user} is not currently blacklisted')
         else:
             await dbcontrol.modify_user(user.id, 'blacklist', 0)
-            await ctx.send(f':white_check_mark:**User {user} has been successfully unblacklisted**')
+            await ctx.send(f':thumbsup:**User {user} has been successfully unblacklisted**')
 
 
 def setup(bot):

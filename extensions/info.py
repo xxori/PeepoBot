@@ -1,3 +1,27 @@
+'''
+MIT License
+
+Copyright (c) 2020 Martin Velikov & Patrick Thompson
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+'''
+
 import discord
 from discord.ext import commands
 import asyncio
@@ -118,19 +142,14 @@ class Utility(commands.Cog):
 
     @commands.command(brief='Shows recently deleted messages')
     async def snipe(self, ctx):
-        snipes = self.bot.snipe_list
+        snipes_serv = self.bot.snipe_info[ctx.guild.id]
         now = datetime.datetime.utcnow()
-        snipes_serv = []
-
-        for msg in snipes:
-            if msg.guild == ctx.message.guild:
-                snipes_serv.append(msg)
 
         embed = discord.Embed(title=f"Deleted messages from {ctx.message.guild.name}", timestamp=datetime.datetime.utcnow())
         embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
         if len(snipes_serv):
             for msg in snipes_serv:
-                embed.add_field(name=f"{msg.author}", value=msg.content, inline=False)
+                embed.add_field(name=f"{msg.author}", value=msg.content[-300:], inline=False)
             await ctx.send(embed=embed)
         else:
             await ctx.send(':x:**There were no messages to snipe**')
@@ -143,7 +162,7 @@ class Utility(commands.Cog):
             if rolesDict == {}:
                 await ctx.send(":x: **No roles currently available**")
             else:
-                await ctx.send(f"**Currently available roles:** ```\n" + "\n".join(rolesDict.keys()) + "```")
+                await ctx.send(f"**Currently available roles:** ```\n" + "- \n".join(rolesDict.keys()) + "```")
         else:
             if name not in rolesDict.keys():
                 await ctx.send(f":x: **Role ``{name}`` not found**")
@@ -155,13 +174,13 @@ class Utility(commands.Cog):
                         await ctx.send(f":x: **I am not allowed to give you the {name} role**")
                     else:
                         await ctx.author.add_roles(role, reason="Automated role command")
-                        await ctx.send(f":white_check_mark: **You have been given the role ``{role.name}``**")
+                        await ctx.send(f":thumbsup: **You have been given the role ``{role.name}``**")
                 else:
                     if role > ctx.guild.me.top_role:
                         await ctx.send(f":x: **I am not allowed to remove the {name} role from you**")
                     else:
                         await ctx.author.remove_roles(role, reason="Automated role command")
-                        await ctx.send(f":white_check_mark: **You have been removed from the role ``{role.name}``**")
+                        await ctx.send(f":thumbsup: **You have been removed from the role ``{role.name}``**")
 
     @commands.command(brief="Creates a new role with specified color", usage="[hex or colour name]", aliases=['color'])
     async def colour(self, ctx, *, colour):
@@ -190,7 +209,7 @@ class Utility(commands.Cog):
                 if role in ctx.author.roles:
                     return await ctx.send(":x: **You already have this role**")
                 await ctx.author.add_roles(role, reason="Automated colour command")
-                await ctx.send(f":white_check_mark: **You have been given the role ``{colour.value}``**")
+                await ctx.send(f":thumbsup: **You have been given the role ``{colour.value}``**")
 
             else:
                 role = await ctx.guild.create_role(name=str(colour.value), colour=colour)
@@ -198,7 +217,7 @@ class Utility(commands.Cog):
                 coloursJSON = json.dumps(coloursDict)
                 await dbcontrol.modify_guild(ctx.guild.id, 'colours', coloursJSON)
                 await ctx.author.add_roles(role, reason="Automated colour command")
-                await ctx.send(f":white_check_mark: **You have been given the role ``{colour.value}``**")
+                await ctx.send(f":thumbsup: **You have been given the role ``{colour.value}``**")
 
 
 

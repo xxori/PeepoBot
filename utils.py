@@ -1,3 +1,27 @@
+'''
+MIT License
+
+Copyright (c) 2020 Martin Velikov & Patrick Thompson
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+'''
+
 import discord
 from discord.ext import commands
 import aiohttp
@@ -49,13 +73,9 @@ def format_thousands(num):
     else:
         return num
 
-def check_dev(id):
-    return id in [308034225137778698, 304219290649886720]
-
 async def is_developer(ctx):
-    if not check_dev(ctx.message.author.id):
-        await ctx.send(f':x: **You need to be a bot developer to run ``{ctx.command.name}``.**')
-        return False
+    if not ctx.bot.check_dev(ctx.message.author.id):
+        raise commands.NotOwner
     return True
 
 def punctuate_number(number, div=','):
@@ -91,9 +111,7 @@ async def audio_playing(ctx):
     if client and client.channel and client.source:
         return True
     else:
-        await ctx.send("**:x:I'm not currently playing audio**")
-        return False
-
+        raise NotPlayingAudio
 
 # Checks if bot is in same vc as command sender
 async def in_voice_channel(ctx):
@@ -102,8 +120,7 @@ async def in_voice_channel(ctx):
     if voice and bot_voice and voice.channel and bot_voice.channel and voice.channel == bot_voice.channel:
         return True
     else:
-        await ctx.send("**:x:You need to be in the same voice channel as the bot to run this command**")
-        return False
+        raise NotInSameVoiceChannel
 
 # Checks if the given argument is a hexadecimal number
 def hex(num: str):
@@ -122,7 +139,9 @@ async def check(bot):
         for guild in bot.guilds:
             guildid = guild.id
             now = datetime.utcnow().timestamp()
-            mutesJSON = (await dbcontrol.get_guild(guildid))['tempmutes']
+
+            gdata = await dbcontrol.get_guild(guildid)
+            mutesJSON = gdata['tempmutes']
             mutesDict = json.loads(mutesJSON)
 
             muteroleid = await dbcontrol.get_setting(guildid,'muterole')
@@ -160,3 +179,11 @@ def colour(colour):
     else:
         return False
     return colour
+
+class NotPlayingAudio(commands.CheckFailure):
+    def __init__(self):
+        super().__init__()
+
+class NotInSameVoiceChannel(commands.CheckFailure):
+    def __init__(self):
+        super().__init__()

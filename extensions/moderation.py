@@ -1,3 +1,27 @@
+'''
+MIT License
+
+Copyright (c) 2020 Martin Velikov & Patrick Thompson
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+'''
+
 import discord
 from discord.ext import commands
 import utils
@@ -13,8 +37,6 @@ class Moderation(commands.Cog):
     @property
     def description(self):
         return 'Moderation-related commands. Admin-only.'
-
-
 
     @commands.has_permissions(ban_members=True)
     @commands.bot_has_permissions(ban_members=True)
@@ -67,12 +89,12 @@ class Moderation(commands.Cog):
     async def mute(self, ctx, target: discord.Member, *, reason=None):
         muteRole = await dbcontrol.get_setting(ctx.guild.id, 'muterole')
         if muteRole is None:
-            await ctx.send(f':x: **A muterole is required for this command to run. Please assign a muterole with {self.bot.prefix}muterole**')
+            await ctx.send(f':x: **A muterole is required for this command to run. Please assign a muterole with {ctx.prefix}muterole**')
             return
 
         muted = ctx.guild.get_role(muteRole)
         if muted is None:
-            await ctx.send(f":x: **The muterole does not exist anymore. Assign a new one with {self.bot.preifx}muterole.**")
+            await ctx.send(f":x: **The muterole does not exist anymore. Assign a new one with {ctx.prefix}muterole.**")
             return
 
         if muted > ctx.guild.me.top_role:
@@ -108,10 +130,10 @@ class Moderation(commands.Cog):
             await dbcontrol.modify_guild(ctx.guild.id, 'tempmutes', mutesJSON)
 
         if muteID is None:
-            await ctx.send(f":x: **There is no muterole. Assign one with {self.bot.prefix}muterole**")
+            await ctx.send(f":x: **There is no muterole. Assign one with {ctx.prefix}muterole**")
         muted = ctx.guild.get_role(muteID)
         if muted is None:
-            await ctx.send(f":x: **The muterole does not exist anymore. Assign a new one with {self.bot.preifx}muterole.**")
+            await ctx.send(f":x: **The muterole does not exist anymore. Assign a new one with {ctx.prefix}muterole.**")
             return
         if muted in target.roles:
             await target.remove_roles(muted)
@@ -152,7 +174,7 @@ class Moderation(commands.Cog):
         rolesDict[name] = role.id
         rolesJSON = json.dumps(rolesDict)
         await dbcontrol.modify_guild(ctx.guild.id, 'roles', rolesJSON)
-        await ctx.send(f":white_check_mark: **Role {name} successfully added**")
+        await ctx.send(f":thumbsup: **Role {name} successfully added**")
 
     @commands.has_permissions(manage_roles=True)
     @commands.command(brief='Deletes a role for people to add to themselves with the role command', usage="[name]")
@@ -166,7 +188,7 @@ class Moderation(commands.Cog):
             rolesDict.pop(name)
             rolesJSON = json.dumps(rolesDict)
             await dbcontrol.modify_guild(ctx.guild.id, 'roles', rolesJSON)
-            await ctx.send(f":white_check_mark: **Role ``{name}`` successfully deleted**")
+            await ctx.send(f":thumbsup: **Role ``{name}`` successfully deleted**")
 
     @commands.has_permissions(manage_roles=True)
     @commands.command(brief='Temporarily mutes a user', usage='[user] <minutes>', aliases=["tmute"])
@@ -195,7 +217,7 @@ class Moderation(commands.Cog):
 
         else:
             await user.add_roles(muterole, reason=f"{ctx.author}:" + f":{time}{unit}")
-            await ctx.send(f":white_check_mark:** User {user} temporarily muted for {time}{unit}**")
+            await ctx.send(f":thumbsup:** User {user} temporarily muted for {time}{unit}**")
             mutesJSON = (await dbcontrol.get_guild(ctx.guild.id))['tempmutes']
             mutesDict = json.loads(mutesJSON) or {}
             if unit.lower() in ["m", "minutes", "minute"]:
