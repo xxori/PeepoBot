@@ -79,7 +79,8 @@ By default, it will look like this:
         308034225137778698,
         304219290649886720
     ],
-    "main_guild": -1
+    "main_guild": -1,
+    "show_splash_screen": true
 }
 ```
 
@@ -102,6 +103,8 @@ If you do not have one yet, create an application from [here](https://discordapp
 commands here, separated by commas. Eg. `[1234, 3214]`
 
 * `main_guild` - ID of the main guild the bot operates in. Set to `-1` to ignore.
+
+* `show_splash_screen` - Should the splash screen be shown when starting the bot? Change to either `true` or `false`.
 
 ---
 ##### License Information
