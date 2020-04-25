@@ -253,7 +253,7 @@ class Execution(commands.Cog):
 
         return embed
 
-    def __create_how_to_pass_embed(self, lang):
+    def __create_how_to_pass_embed(self, ctx, lang):
         """
         Creates a Discord embed guide for passing code.
         Includes the 3 methods of passing source code.
@@ -263,12 +263,12 @@ class Execution(commands.Cog):
         embed.set_thumbnail(url=lang.icon)
         embed.add_field(
             name="Method 1 (Plain)",
-            value=(f"{self.bot.command_prefix}{lang.command}\n" "code"),
+            value=(f"{ctx.prefix}{lang.command}\n" "code"),
             inline=False,
         )
         embed.add_field(
             name="Method 2 (Code block)",
-            value=(f"{self.bot.command_prefix}{lang.command}\n" "\`\`\`code\`\`\`"),
+            value=(f"{ctx.prefix}{lang.command}\n" "\`\`\`code\`\`\`"),
             inline=False,
         )
         embed.add_field(
@@ -321,7 +321,7 @@ class Execution(commands.Cog):
         """
 
         if code == None:
-            await ctx.send(embed=self.__create_how_to_pass_embed(lang))
+            await ctx.send(embed=self.__create_how_to_pass_embed(ctx, lang))
             return
 
         if code.startswith("-v") or code.startswith("-version"):

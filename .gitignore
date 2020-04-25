@@ -127,8 +127,7 @@ config.json
 config.json.old
 common.db
 
-# Pycharm thing
-.idea/
+
 
 # Data Storage
 data/

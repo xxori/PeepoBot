@@ -1,3 +1,27 @@
+'''
+MIT License
+
+Copyright (c) 2020 Martin Velikov & Patrick Thompson
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+'''
+
 import discord
 from discord.ext import commands
 import utils
@@ -28,6 +52,9 @@ class Tags(commands.Cog):
         tag = await dbcontrol.get_guild_tag(ctx.guild.id, name)
         if tag is not None:
             await ctx.send(f':x: **Tag ``{name}`` already exists and is owned by ``{self.bot.get_user(tag["author"])}``**')
+            return
+        if name.strip() in ['create', 'delete', 'info', 'list']:
+            await ctx.send(f":x: **`{name.strip()}` is a subcommand of `tag`, pick a different name.**")
             return
         await dbcontrol.add_tag(author=ctx.message.author, guild=ctx.guild, name=name, content=content)
         await ctx.send(f":thumbsup: **Tag ``{name}`` successfully created!**")
@@ -70,6 +97,7 @@ class Tags(commands.Cog):
         for tag in tags:
             embed.add_field(value=tag['name'], name=datetime.datetime.fromtimestamp(tag['created']).strftime('%A %d %B %Y at %I:%M %p (UTC)'), inline=False)
         await ctx.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Tags(bot))
