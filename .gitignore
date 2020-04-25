@@ -134,3 +134,6 @@ data/
 
 # Logging
 logs/
+
+# Pycharm garbage
+.idea/
