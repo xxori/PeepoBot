@@ -44,7 +44,7 @@ class EventHandler(commands.Cog):
 
         # missing/malformed things
         if isinstance(e, commands.MissingRequiredArgument):
-            clean_param = e.param.split(':')[0]
+            clean_param = e.param[0].split(':')[0]
             await ctx.send(f':x: **``{ctx.command.name}`` requires the ``{clean_param}`` argument!**')
             await ctx.send_help(ctx.command.name)
 
