@@ -44,12 +44,14 @@ class EventHandler(commands.Cog):
 
         # missing/malformed things
         if isinstance(e, commands.MissingRequiredArgument):
-            clean_param = e.param[0].split(':')[0]
+            clean_param = str(e.param).split(':')[0]
             await ctx.send(f':x: **``{ctx.command.name}`` requires the ``{clean_param}`` argument!**')
             await ctx.send_help(ctx.command.name)
 
         elif isinstance(e, commands.BadArgument):
-            await ctx.send(f':x: **{e.args[0]}**')
+            msg = e.args[0].replace('"', '`')
+            await ctx.send(f":x: **{msg}**")
+            await ctx.send_help(ctx.command.name)
 
         elif isinstance(e, commands.CommandNotFound):
             pass # annoying reactions when randomly typing prefix, removed old code

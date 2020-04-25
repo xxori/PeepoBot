@@ -58,7 +58,7 @@ class Settings(commands.Cog):
                 return
 
             await dbcontrol.modify_setting(ctx.guild.id, 'prefix', prefix)
-            await ctx.send(f':thumbsup: **Set the prefix to `{prefix}`, I will no longer respond to `{p}`.**')
+            await ctx.send(f':thumbsup: **Set the prefix to `{prefix}`**')
 
 
     @commands.has_permissions(manage_roles=True)
