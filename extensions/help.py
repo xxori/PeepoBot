@@ -78,7 +78,7 @@ class HelpCommand(commands.HelpCommand):
                 await self.context.author.send(doc)
 
     async def send_command_help(self, cmd):
-        cmd_name = "|".join(cmd.aliases) if len(cmd.aliases) else cmd.name
+        cmd_name = cmd.name + "|" + "|".join(cmd.aliases) if len(cmd.aliases) else cmd.name
         cmd_desc = cmd.description or cmd.brief or "No Description"
         cmd_info = f'{self.clean_prefix}{cmd_name} {cmd.usage or ""}'
 
