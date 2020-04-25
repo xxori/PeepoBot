@@ -91,24 +91,24 @@ class HelpCommand(commands.HelpCommand):
         cmd_desc = cmd.description or cmd.brief or "No Description"
         cmd_info = f'{self.clean_prefix}{cmd_name} {cmd.usage or ""}'
 
-        cmds = cmd.commands
+        subcommands = cmd.commands
 
-        if len(cmds) > 0:
-            sub = '\n\n== Subcommands =='
-            for cmd in cmds:
-                cmd_name = cmd.name + "|" + "|".join(cmd.aliases) if len(cmd.aliases) else cmd.name
-                cmd_desc = cmd.brief or cmd.description[:20] or "No Description"
+        if len(subcommands) > 0:
+            sub_list = '\n\n== Subcommands =='
+            for sub in subcommands:
+                sub_name = sub.name + "|" + "|".join(sub.aliases) if len(sub.aliases) else sub.name
+                sub_desc = sub.brief or sub.description[:20] or "No Description"
 
-                cmd_info = f'{self.clean_prefix}{cmd_name} {cmd.usage or ""}'
+                sub_info = f'{self.clean_prefix}{cmd_name} {sub_name} {sub.usage or ""}'
 
-                spacer = 30-len(cmd_info)
+                spacer = 30-len(sub_info)
                 if spacer < 0: spacer = 0
 
-                sub += f'\n{cmd_info} {" "*spacer}:: {cmd_desc}'
+                sub_list += f'\n{sub_info} {" "*spacer}:: {sub_desc}'
         else:
-            sub = ''
+            sub_list = ''
 
-        text = f'```asciidoc\n{cmd_info}\n* {cmd_desc}{sub}```'
+        text = f'```asciidoc\n{cmd_info}\n* {cmd_desc}{sub_list}```'
         await self.get_destination().send(text)
 
     async def command_not_found(self, string):

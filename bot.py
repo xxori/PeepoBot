@@ -74,7 +74,7 @@ class Peepo(commands.AutoShardedBot):
         d["M"], d["S"] = divmod(rem, 60)
         return fmt.format(**d)
 
-    def check_dev(id):
+    def check_dev(self, id):
         return (id in self.config['authorized_dev_ids'])
 
     def load_cogs(self):

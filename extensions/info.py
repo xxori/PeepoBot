@@ -142,7 +142,11 @@ class Utility(commands.Cog):
 
     @commands.command(brief='Shows recently deleted messages')
     async def snipe(self, ctx):
-        snipes_serv = self.bot.snipe_info[ctx.guild.id]
+        snipes_serv = self.bot.snipe_info.get(ctx.guild.id)
+        if snipes_serv is None:
+            await ctx.send(':x: **There was nothing to snipe!**')
+            return 
+
         now = datetime.datetime.utcnow()
 
         embed = discord.Embed(title=f"Deleted messages from {ctx.message.guild.name}", timestamp=datetime.datetime.utcnow())

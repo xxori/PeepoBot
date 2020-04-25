@@ -91,13 +91,22 @@ class Tags(commands.Cog):
     async def list(self, ctx, user: discord.Member = None):
         if not user:
             user = ctx.author
+        if user.bot:
+            await ctx.send(":x: **Bots can't own tags.**")
+            return
+
         tags = await dbcontrol.get_all_tags(user.id, ctx.guild.id)
         embed = discord.Embed(color=discord.Colour.blurple())
-        embed.set_author(name=f'Tags by {ctx.author}', icon_url=user.avatar_url)
+        embed.set_author(name=f'Tags by {user}', icon_url=user.avatar_url)
         for tag in tags:
             embed.add_field(value=tag['name'], name=datetime.datetime.fromtimestamp(tag['created']).strftime('%A %d %B %Y at %I:%M %p (UTC)'), inline=False)
         await ctx.send(embed=embed)
 
+    @commands.command(
+        brief = 'Lists all of your tags in the current guild (alias to tag list)'
+    )
+    async def tags(self, ctx):
+        await self.list.invoke(ctx)
 
 def setup(bot):
     bot.add_cog(Tags(bot))

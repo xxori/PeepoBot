@@ -144,8 +144,8 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_channels=True)
     @commands.command(brief='Execute command as another user.', usage='[user] <command>', aliases=['runas', 'please'])
     async def sudo(self, ctx, user: discord.Member, *, cmd):
-        if not utils.check_dev(ctx.message.author.id):
-            if utils.check_dev(user.id):
+        if not self.bot.check_dev(ctx.message.author.id):
+            if self.bot.check_dev(user.id):
                 await ctx.send(f':x: **You cannot execute commands as ``{user}`` because they are a bot developer.**')
                 return
 
