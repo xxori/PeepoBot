@@ -166,7 +166,7 @@ async def check(bot):
                             used = True
                     if not used:
                         await role.delete(reason="Automated colour role removal, no users have role")
-                    coloursDict.pop(colour)
+                        coloursDict.pop(colour)
                 else:
                     coloursDict.pop(colour)
             coloursJSON = json.dumps(coloursDict)
