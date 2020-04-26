@@ -26,6 +26,8 @@ import discord
 from discord.ext import commands
 import dbcontrol
 import json
+from discord.ext.commands import RoleConverter, TextChannelConverter
+
 
 class Settings(commands.Cog):
     def __init__(self, bot):
@@ -69,10 +71,17 @@ class Settings(commands.Cog):
 
     @commands.has_permissions(manage_roles=True)
     @settings.command(brief="Sets the default role for new users", usage='[role]')
-    async def defaultrole(self, ctx, role: discord.Role = None):
+    async def defaultrole(self, ctx, role: str = None):
         if role is not None:
+            if role.lower() in ["-1", "none", "off"]:
+                await dbcontrol.modify_setting(ctx.guild.id, "defaultrole", None)
+                return await ctx.send(":white_check_mark:  **Default role successfully turned off**")
+
+            converter = RoleConverter()
+            role = await converter.convert(ctx, role)
             await dbcontrol.modify_setting(ctx.guild.id, "defaultrole", role.id)
             await ctx.send(f":white_check_mark: **Default role set to ``{role.name}``**")
+
         else:
             rol = await dbcontrol.get_setting(ctx.guild.id, 'defaultrole')
             role = ctx.guild.get_role(rol)
@@ -81,8 +90,14 @@ class Settings(commands.Cog):
 
     @commands.has_permissions(manage_roles=True)
     @settings.command(brief="Sets the channel for logging.", usage='[channel]')
-    async def logchannel(self, ctx, channel: discord.TextChannel = None):
+    async def logchannel(self, ctx, channel: str = None):
         if channel is not None:
+            if channel.lower() in ["-1", "none", "off"]:
+                await dbcontrol.modify_setting(ctx.guild.id, "logchannel", None)
+                return await ctx.send(":white_check_mark: **Log channel successfully turned off**")
+
+            converter = TextChannelConverter()
+            channel = await converter.convert(ctx, channel)
             await dbcontrol.modify_setting(ctx.guild.id, "logchannel", channel.id)
             await  ctx.send(f":white_check_mark: **Log channel set to ``{channel.name}``**")
         else:
@@ -92,8 +107,14 @@ class Settings(commands.Cog):
 
     @commands.has_permissions(manage_roles=True)
     @settings.command(brief="Sets the channel for announcements.", usage='[channel]')
-    async def announcechannel(self, ctx, channel: discord.TextChannel = None):
+    async def announcechannel(self, ctx, channel: str = None):
         if channel is not None:
+            if channel.lower() in ["-1", "none", "off"]:
+                await dbcontrol.modify_setting(ctx.guild.id, "announcechannel", None)
+                return await ctx.send(":white_check_mark: **Announce channel successfully turned off**")
+
+            converter = TextChannelConverter()
+            channel = await converter.convert(ctx, channel)
             await dbcontrol.modify_setting(ctx.guild.id, "announcechannel", channel.id)
             await ctx.send(f":white_check_mark: **Announcement channel set to ``{channel.name}``**")
         else:
