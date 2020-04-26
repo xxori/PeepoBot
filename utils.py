@@ -160,11 +160,14 @@ async def check(bot):
             for colour in list(coloursDict.keys()):
                 used = False
                 role = guild.get_role(coloursDict[colour])
-                for member in guild.members:
-                    if role in member.roles:
-                        used = True
-                if not used:
-                    await role.delete(reason="Automated colour role removal, no users have role")
+                if role:
+                    for member in guild.members:
+                        if role in member.roles:
+                            used = True
+                    if not used:
+                        await role.delete(reason="Automated colour role removal, no users have role")
+                    coloursDict.pop(colour)
+                else:
                     coloursDict.pop(colour)
             coloursJSON = json.dumps(coloursDict)
             await dbcontrol.modify_guild(guildid, 'colours', coloursJSON)

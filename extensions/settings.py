@@ -37,8 +37,14 @@ class Settings(commands.Cog):
 
     @commands.group(invoke_without_command=True, brief=f"Server settings category of commands", usage="[subcommand] <argument>")
     async def settings(self, ctx):
-        g = await dbcontrol.get_guild(ctx.guild.id)
-        settings = g['settings']
+        if ctx.invoked_subcommand is None:
+            g = await dbcontrol.get_guild(ctx.guild.id)
+            settings = g['settings']
+            settings = json.loads(settings)
+            msg = ""
+            for setting in settings.keys():
+                msg += f"**{setting}** : ``{settings[setting]}``\n"
+            await ctx.send(msg)
 
     @commands.has_permissions(manage_messages=True)
     @settings.command(brief="Changes/gets the guild prefix", usage="[new prefix]")
