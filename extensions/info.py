@@ -234,6 +234,7 @@ class Utility(commands.Cog):
             else:
                 response = await session.get(url=url+distro)
             response = await response.read()
+            await session.close()
         soup = bs4.BeautifulSoup(response, "html.parser")
         if len(soup.select(".TablesTitle")) == 0:
             return await ctx.send(":x:**Invalid distribution**")
@@ -265,9 +266,9 @@ class Utility(commands.Cog):
             embed.add_field(name="Forums: ", value=data[4][0], inline=True)
         if data[6][0] != "--":
             embed.add_field(name="Documentation: ", value=data[6][0].replace("•", " "), inline=True)
-        if data[9][0] != "--":
+        if len(data) >= 9 and data[9][0] != "--":
             embed.add_field(name="Download: ", value=data[9][0].replace("•", " "), inline=True)
-        if data[10][0] != "--":
+        if len(data) >= 10 and data[10][0] != "--":
             embed.add_field(name="Bug Tracker: ", value=data[10][0].replace("•", " "), inline=True)
         await ctx.send(embed=embed)
 
