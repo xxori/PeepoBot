@@ -224,7 +224,7 @@ class Utility(commands.Cog):
                 await ctx.author.add_roles(role, reason="Automated colour command")
                 await ctx.send(f":thumbsup: **You have been given the role ``{colour.value}``**")
 
-    @commands.command(aliases=["dw", "distribution", "distro"])
+    @commands.command(aliases=["dw", "distribution", "distro"], brief="Finds information about a linux distro", usage="<distro>")
     async def distrowatch(self, ctx, *, distro):
         url = "https://distrowatch.com/table.php?distribution="
         root = "http://distrowatch.com/"
@@ -259,7 +259,6 @@ class Utility(commands.Cog):
             cols = row.find_all("td")
             cols = [element.text.strip() for element in cols]
             data.append([element for element in cols if element])
-        print(data)
         if data[2][0] != "--":
             embed.add_field(name="Homepage: ", value=data[2][0], inline=True)
         if data[4][0] != "--":
