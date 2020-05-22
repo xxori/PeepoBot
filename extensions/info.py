@@ -33,6 +33,7 @@ import time
 import re
 import dbcontrol
 import json
+import bs4
 
 class Utility(commands.Cog):
     def __init__(self, bot):
@@ -223,6 +224,53 @@ class Utility(commands.Cog):
                 await ctx.author.add_roles(role, reason="Automated colour command")
                 await ctx.send(f":thumbsup: **You have been given the role ``{colour.value}``**")
 
+    @commands.command(aliases=["dw", "distribution", "distro"])
+    async def distrowatch(self, ctx, *, distro):
+        url = "https://distrowatch.com/table.php?distribution="
+        root = "http://distrowatch.com/"
+        async with aiohttp.ClientSession(loop=self.bot.loop) as session:
+            if distro.lower() == "random":
+                response = await session.get(url="https://distrowatch.com/random.php")
+            else:
+                response = await session.get(url=url+distro)
+            response = await response.read()
+        soup = bs4.BeautifulSoup(response, "html.parser")
+        if len(soup.select(".TablesTitle")) == 0:
+            return await ctx.send(":x:**Invalid distribution**")
+        # Valid distro
+        properties = list(filter(None, soup.find("td", {"class": "TablesTitle"}).get_text().split("\n")))
+        embed = discord.Embed(title=soup.find("h1").text, description=properties[3], timestamp=datetime.datetime.utcnow(), color=discord.Color.blurple())
+        if len(soup.select(".TablesTitle > img:nth-child(6)")):
+            embed.set_footer(text=soup.find("h1").text, icon_url=root+soup.select(".TablesTitle > img:nth-child(6)")[0].attrs["src"])
+        else:
+            embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+        embed.add_field(name="Os Type: ", value=properties[1].split(": ")[1].replace("Based on", ""), inline=False)
+        embed.add_field(name="Based on: ", value=properties[1].split(": ")[2].replace("Origin", ""), inline=False)
+        embed.add_field(name="Origin: ", value=properties[1].split(": ")[3], inline=False)
+        embed.add_field(name="Architecture: ", value=properties[2].split(": ")[1].replace("Desktop", ""), inline=False)
+        embed.add_field(name="Desktop Environment: ", value=properties[2].split(": ")[2].replace("Category", ""), inline=False)
+        embed.add_field(name="Category: ", value=properties[2].split(": ")[3].replace("Status", ""), inline=False)
+        embed.add_field(name="Status: ", value=properties[2].split(": ")[4].replace("Popularity", ""), inline=False)
+
+        info = soup.find("table", {"class": "Info"})
+        data = []
+        rows = info.find_all("tr")
+        for row in rows:
+            cols = row.find_all("td")
+            cols = [element.text.strip() for element in cols]
+            data.append([element for element in cols if element])
+        print(data)
+        if data[2][0] != "--":
+            embed.add_field(name="Homepage: ", value=data[2][0], inline=True)
+        if data[4][0] != "--":
+            embed.add_field(name="Forums: ", value=data[4][0], inline=True)
+        if data[6][0] != "--":
+            embed.add_field(name="Documentation: ", value=data[6][0].replace("•", " "), inline=True)
+        if data[9][0] != "--":
+            embed.add_field(name="Download: ", value=data[9][0].replace("•", " "), inline=True)
+        if data[10][0] != "--":
+            embed.add_field(name="Bug Tracker: ", value=data[10][0].replace("•", " "), inline=True)
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
