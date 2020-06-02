@@ -272,6 +272,31 @@ class Utility(commands.Cog):
             embed.add_field(name="Bug Tracker: ", value=data[10][0].replace("•", " "), inline=True)
         await ctx.send(embed=embed)
 
+    @commands.command(brief="Gets a random xkcd comic, or the specified number", usage="<comic number or random>")
+    async def xkcd(self, ctx, num="random"):
+        root = "https://xkcd.com/"
+        async with ctx.typing():
+            if num.lower() in ["random", "r", "rand"]:
+                num = random.randint(1, 2314)
+            elif not num.isnumeric():
+                return await ctx.send(":x: **Don't try to break me**")
+            url = root+str(num)
+            async with aiohttp.ClientSession(loop=self.bot.loop) as session:
+                response = await session.get(url)
+                html = await response.read()
+                await session.close()
+            if response.status != 200:
+                return await ctx.send(":x: **Invalid comic number**")
+            soup = bs4.BeautifulSoup(html, "html.parser")
+            title = soup.select("#ctitle")[0].text
+            img = "https:" + soup.find_all("img")[1].attrs["src"]
+            embed = discord.Embed(title=f"#{num}: {title}", timestamp=datetime.datetime.utcnow(), description=f"[Site Link]({url})\n[Image URL]({img})", color=discord.Color.blurple())
+            embed.set_image(url=img)
+            embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+        await ctx.send(embed=embed)
+
+
+
 
 def setup(bot):
     bot.add_cog(Utility(bot))
