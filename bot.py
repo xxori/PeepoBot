@@ -33,7 +33,7 @@ import random
 import utils
 import json
 import time
-import sys
+#import sys
 import os
 import aiohttp
 
