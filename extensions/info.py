@@ -126,7 +126,6 @@ class Utility(commands.Cog):
                 response = await session.get(url='https://uselessfacts.jsph.pl/random.json?language=en')
                 # Uses inbuilt aiohttp parser to parse json
                 fact = await response.json()
-                await response.close()
                 await session.close()
             value = fact['text']
             embed.add_field(name='Fact of the Day', value=value, inline=False)
