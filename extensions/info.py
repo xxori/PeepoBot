@@ -306,12 +306,13 @@ class Utility(commands.Cog):
                 await session.close()
             if response.status != 200:
                 return await ctx.send(":x: **Invalid comic number**")
-            # Instantiating beautifulsoup object to parse th html
+            # Instantiating beautifulsoup object to parse the html
             soup = bs4.BeautifulSoup(html, "html.parser")
             # Selecting the comic title with css selector
             title = soup.select("#ctitle")[0].text
             # The second image on the page is the comic image
-            img = "https:" + soup.find_all("img")[1].attrs["src"]
+            div = soup.find("div", attrs={"id": "comic"})
+            img = "http:" + div.find("img").attrs["src"]
             embed = discord.Embed(title=f"#{num}: {title}", timestamp=datetime.datetime.utcnow(), description=f"[Site Link]({url})\n[Image URL]({img})", color=discord.Color.blurple())
             embed.set_image(url=img)
             embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
