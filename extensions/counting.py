@@ -114,8 +114,8 @@ class Counting(commands.Cog):
         except:
             return
         count = self.bot.ongoing_counts[ctx.guild.id][str(ctx.channel.id)]
-        #if count["last_user"] == ctx.author.id:
-        #   return await ctx.send(f":x: **{ctx.author.mention} You can't count twice in a row dumbass**")
+        if count["last_user"] == ctx.author.id:
+           return await ctx.send(f":x: **{ctx.author.mention} You can't count twice in a row dumbass**")
         count["last_user"] = ctx.author.id
         if number == count["current"] + 1:
             count["current"] += 1
