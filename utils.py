@@ -188,7 +188,7 @@ async def init_counts(bot):
             counts[int(guild.id)] = {}
         else:
             resultDict = json.loads(result)
-        counts[int(guild.id)] = resultDict
+            counts[int(guild.id)] = resultDict
     return counts
 
 async def save_counts(bot, dict):
