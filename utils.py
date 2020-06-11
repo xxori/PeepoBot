@@ -180,6 +180,21 @@ def colour(colour):
         return False
     return colour
 
+async def init_counts(bot):
+    counts = {}
+    for guild in bot.guilds:
+        result = (await dbcontrol.get_guild(guild.id))["counts"]
+        resultDict = json.loads(result)
+        if not resultDict or resultDict == {}:
+            counts[int(guild.id)] = {}
+        else:
+            counts[int(guild.id)] = resultDict
+    return counts
+
+async def save_counts(bot, dict):
+    for guild in dict.keys():
+        countsJSON = json.dumps(dict[guild])
+        await dbcontrol.modify_guild(guild, "counts", countsJSON)
 # Converts string to hexadecimal, or returns None if it is invalid
 def hex(num: str):
     try:

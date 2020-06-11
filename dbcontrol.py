@@ -42,7 +42,7 @@ async def initialize_tables(bot):
 
         await c.execute('CREATE TABLE IF NOT EXISTS users(id INTEGER, seen_in TEXT, settings TEXT, bio TEXT, image_url TEXT, profile_color INTEGER, blacklist INTEGER)')
         await c.execute('CREATE TABLE IF NOT EXISTS tags(author INTEGER, guild INTEGER, created REAL, name TEXT, content TEXT)')
-        await c.execute('CREATE TABLE IF NOT EXISTS guilds(id INTEGER, settings TEXT, roles TEXT, tempmutes TEXT, colours TEXT)')
+        await c.execute('CREATE TABLE IF NOT EXISTS guilds(id INTEGER, settings TEXT, roles TEXT, tempmutes TEXT, colours TEXT, counts TEXT)')
 
         bot.logger.info('Cleaning guild database.')
         await rebuild_guilds(bot)
@@ -68,9 +68,9 @@ async def rebuild_guilds(bot):
 
             if not data:
                 if guild.system_channel:
-                    await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', (str(guild.id), '{"prefix": "' + bot.default_prefix + '", "announcechannel": ' + str(guild.system_channel.id) + '}', '{}', '{}', "{}"))
+                    await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?, ?)', (str(guild.id), '{"prefix": "' + bot.default_prefix + '", "announcechannel": ' + str(guild.system_channel.id) + '}', '{}', '{}', "{}", "{}"))
                 else:
-                    await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?)', (str(guild.id), '{"prefix": "' + bot.default_prefix + '"}', '{}', '{}', "{}"))
+                    await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?, ?)', (str(guild.id), '{"prefix": "' + bot.default_prefix + '"}', '{}', '{}', "{}", "{}"))
 
         await c.commit()
 
@@ -84,7 +84,7 @@ async def add_guild(bot, id):
             if channel.name.strip() == 'announcements':
                 announcements_channel = channel.id
 
-        await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', id, '$', -1, -1, announcements_channel, -1, -1, -1, -1)
+        await c.execute(f'INSERT INTO guilds VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', id, '$', -1, -1, announcements_channel, -1, -1, -1, -1, -1)
 
         for member in guild.members:
             add_user(member.id, bot)
