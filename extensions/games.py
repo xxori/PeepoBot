@@ -27,30 +27,36 @@ from discord.ext import commands
 class Games(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.ongoing_games = {"ttt": [], "hangman": []}
+        self.ongoing_games = []
 
     @commands.command()
-    async def tictactoe(self, ctx):
-        self.ongoing_games["ttt"].append(ctx.channel.id)
+    async def tictactoe(self, ctx, opponent: discord.Member):
+        self.ongoing_games.append(
+            {
+                "channel": ctx.channel.id,
+                "members": [ctx.author.id, opponent.id],
+                "game": "TicTacToe"
+            })
 
     @commands.command()
     async def stopgame(self, ctx):
-        no_game = True
-        for game in self.ongoing_games.keys():
-            if ctx.channel.id in self.ongoing_games[game]:
-                no_game = False
-                self.ongoing_games[game].remove(ctx.channel.id)
-                await ctx.send(f":white_check_mark: **Game of ``{game}`` stopped**")
-        if no_game:
-            await ctx.send(":x: **There are currently no ongoing games in this channel**")
+        no_games = True
+        for ongoing_game in self.ongoing_games:
+            if ctx.channel.id == ongoing_game["channel"]:
+                no_games = False
+                self.ongoing_games.remove(ongoing_game)
+                await ctx.send(f":white_check_mark: **Game of ``{ongoing_game['game']}`` successfully halted**")
+        if no_games:
+            await ctx.send(":x: **No games currently ongoing in this channel**")
+
 
     @commands.Cog.listener()
     async def on_message(self, message):
         ctx = await self.bot.get_context(message)
         if ctx.author.bot:
             return
-        for game in self.ongoing_games.keys():
-            if ctx.channel.id in self.ongoing_games[game]:
+        for game in self.ongoing_games:
+            if ctx.channel.id == game["channel"]:
                 await ctx.send("ongoing game")
 
 def setup(bot):

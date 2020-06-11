@@ -123,6 +123,7 @@ class Peepo(commands.AutoShardedBot):
         if hasattr(self, 'session'):
             await self.session.close()
         await super().close()
+        await utils.save_counts(self, self.ongoing_counts)
         self.logger.info('Bot has shut down successfully.')
 
     # events
@@ -149,6 +150,8 @@ class Peepo(commands.AutoShardedBot):
     async def on_ready(self):
         self.logger.info('Readying database for operations.')
         await dbcontrol.initialize_tables(self)
+        # Grab colours from db
+        self.ongoing_counts = await utils.init_counts(self)
 
         old_time = self.connect_time
         self.connect_time = datetime.datetime.utcnow()
@@ -162,6 +165,9 @@ class Peepo(commands.AutoShardedBot):
         # Starting 30 second cycle for colours and mutes checking
         self.logger.info("Starting role check loop.")
         self.loop.create_task(utils.check(self))
+
+        # Grab colours from db
+        self.ongoing_counts = await utils.init_counts(self)
 
         self.logger.info(f'Starting presence loop.')
         self.loop.create_task(self.presence_changer())
