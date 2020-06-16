@@ -61,9 +61,11 @@ class Settings(commands.Cog):
             return
         else:
             prefix = prefix.strip()
+            if str(prefix).isnumeric():
+                return await ctx.send(":x: **No number prefix, yu try to break me**")
+
             if p == prefix:
-                await ctx.send(':x: **Have some originality, the new prefix can''t be the same as before.**')
-                return
+                return await ctx.send(':x: **Have some originality, the new prefix can''t be the same as before.**')
 
             await dbcontrol.modify_setting(ctx.guild.id, 'prefix', prefix)
             await ctx.send(f':thumbsup: **Set the prefix to `{prefix}`**')
