@@ -36,6 +36,13 @@ class Counting(commands.Cog):
     def description(self):
         return "Command to manage the counting feature"
 
+    @commands.command(brief="Gets current number of a count")
+    async def nc(self, ctx):
+        if str(ctx.channel.id) in self.bot.ongoing_counts[ctx.guild.id].keys():
+            await ctx.send(self.bot.ongoing_counts[ctx.guild.id][ctx.channel.id]["current"])
+        else:
+            await ctx.send(":x:")
+
     @commands.group(invoke_without_command=True, brief="Group containing management and info of counting", usage="[subcommand] <argument(s)>")
     async def count(self, ctx):
         if str(ctx.channel.id) not in self.bot.ongoing_counts[ctx.guild.id].keys():
@@ -60,7 +67,7 @@ class Counting(commands.Cog):
     async def start(self, ctx, channel = None):
         if channel:
             converter = commands.TextChannelConverter
-            channel = converter.convert(channel)
+            channel = converter.convert(ctx, channel)
         else:
             channel = ctx.channel
         if str(channel.id) in self.bot.ongoing_counts[ctx.guild.id].keys():
@@ -74,7 +81,7 @@ class Counting(commands.Cog):
     async def stop(self, ctx, channel = None):
         if channel:
             converter = commands.TextChannelConverter
-            channel = converter.convert(channel)
+            channel = converter.convert(ctx, channel)
         else:
             channel = ctx.channel
 
@@ -108,6 +115,12 @@ class Counting(commands.Cog):
         if str(ctx.channel.id) not in self.bot.ongoing_counts[ctx.guild.id].keys(): # No ongoing count in current channel
             return
 
+        if await dbcontrol.is_blacklist(ctx.author.id):
+            return
+
+        if ctx.author.bot:
+            return
+
         list = message.content.split(" ")
         try:
             number = int(list[0])
@@ -115,7 +128,7 @@ class Counting(commands.Cog):
             return
         count = self.bot.ongoing_counts[ctx.guild.id][str(ctx.channel.id)]
         if count["last_user"] == ctx.author.id:
-           return await ctx.send(f":x: **{ctx.author.mention} You can't count twice in a row dumbass**")
+            return await ctx.send(f":x: **{ctx.author.mention} You can't count twice in a row dumbass**")
         count["last_user"] = ctx.author.id
         if number == count["current"] + 1:
             count["current"] += 1
@@ -137,6 +150,19 @@ class Counting(commands.Cog):
                 await ctx.send(f"**{ctx.author.mention} has messed up the count at {count['current']}**")
                 count["last_fail"] = ctx.author.id
                 count["current"] = 0
+
+    @commands.Cog.listener()
+    async def on_message_delete(self, message):
+        ctx = await self.bot.get_context(message)
+        if str(ctx.channel.id) not in self.bot.ongoing_counts[ctx.guild.id].keys():
+            return
+        if ctx.author.bot:
+            return
+        if await dbcontrol.is_blacklist(ctx.author.id):
+            return
+
+        await ctx.send(f"Some retard ({ctx.author.mention}) deleted a message. The current number is ``{self.bot.ongoing_counts[ctx.guild.id][str(ctx.channel.id)]['current']}``")
+
 
 def setup(bot):
     bot.add_cog(Counting(bot))
