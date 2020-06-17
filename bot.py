@@ -116,6 +116,8 @@ class Peepo(commands.AutoShardedBot):
         #asyncio.get_event_loop().run_until_complete(self.cb.close())
 
     async def get_prefix(self, message):
+        if message.guild is None:
+            return "!"
         prefix = await dbcontrol.get_setting(message.guild.id, 'prefix')
         return prefix
 
