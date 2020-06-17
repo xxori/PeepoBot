@@ -318,6 +318,36 @@ class Utility(commands.Cog):
             embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
+    @commands.command(aliases=["gh", "source", "git"], brief="Gets info about the linked github repo")
+    async def github(self, ctx):
+        root = "https://api.github.com/"
+        repo = self.bot.config["github_link"].replace("https://github.com/", "")
+        async with aiohttp.ClientSession(loop=self.bot.loop) as session:
+            resp = await session.get(root+"repos/"+repo)
+            data = await resp.json()
+            cresp = await session.get(data["commits_url"].replace("{/sha}", ""))
+            cdata = await cresp.json()
+            await session.close()
+        if "message" in data.keys() and data["message"] == "Not Found":
+            self.bot.logger.info("Github is invalid")
+            return await ctx.send(":x: **The github repo attached to the bot is invalid**")
+        embed = discord.Embed(title=data["full_name"], color=discord.Color.blurple(), timestamp=datetime.datetime.utcnow())
+        if "description" in data.keys():
+            embed.description = data["description"]
+        embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
+        embed.set_thumbnail(url=data["owner"]["avatar_url"])
+        embed.add_field(name="Owner", value=f"[{data['owner']['login']}]({data['owner']['html_url']})", inline=False)
+        embed.add_field(name="URL", value=data["html_url"], inline=False)
+        embed.add_field(name="License", value=data["license"]["name"], inline=False)
+        embed.add_field(name="Most Recent Commit", value=f"[{cdata[0]['commit']['message']}]({cdata[0]['html_url']}) - [{cdata[0]['author']['login']}]({cdata[0]['author']['html_url']})")
+        await ctx.send(embed=embed)
+
+    @commands.command(brief="Sends a link to add the bot to your own server")
+    async def invite(self, ctx):
+        await ctx.send(discord.utils.oauth_url(self.bot.user.id)+"&permissions=8")
+
+
+
 
 
 
