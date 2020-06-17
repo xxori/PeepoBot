@@ -109,6 +109,9 @@ class Counting(commands.Cog):
     async def on_message(self, message):
         ctx = await self.bot.get_context(message)
 
+        if ctx.guild is None:
+            return
+
         if ctx.author.bot: # No counting bots
             return
 
