@@ -203,7 +203,8 @@ def read_config():
         },
         'authorized_dev_ids': [308034225137778698, 304219290649886720], # developers that can execute dev commands
         'main_guild': -1, # main guild bot operates around, set to -1 to disable,
-        'show_splash_screen': True
+        'show_splash_screen': True,
+        'github_link': -1
     }
 
     if not os.path.isfile('config.json'):
