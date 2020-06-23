@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 '''
 
+import asyncio
 import aiohttp
 import discord
 from discord.ext import commands
@@ -94,11 +95,14 @@ class Fun(commands.Cog):
         embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
-    @commands.command(brief="Sends a peepee picture(nsfw channels only)")
-    async def peepee(self, ctx):
-        embed = discord.Embed(description="As promised [https://imgur.com/gallery/SYyT2Nf](http://bitly.com/98K8eH)", colour=discord.Colour.blurple(), timestamp=datetime.datetime.utcnow())
-        embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
-        await ctx.send(embed=embed)
+    @commands.command()
+    async def annoy(self, ctx, user: discord.User, text="bepis"):
+        dmchannel = user.dm_channel
+        if not dmchannel:
+            dmchannel = await user.create_dm()
+        for _ in range(50):
+            await dmchannel.send(text)
+            await asyncio.sleep(random.randint(1,10))
 
 def setup(bot):
     bot.add_cog(Fun(bot))

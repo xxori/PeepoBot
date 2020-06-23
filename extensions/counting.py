@@ -38,8 +38,9 @@ class Counting(commands.Cog):
 
     @commands.command(brief="Gets current number of a count")
     async def nc(self, ctx):
-        if str(ctx.channel.id) in self.bot.ongoing_counts[ctx.guild.id].keys():
-            await ctx.send(self.bot.ongoing_counts[ctx.guild.id][ctx.channel.id]["current"])
+        counts = self.bot.ongoing_counts[ctx.guild.id]
+        if str(ctx.channel.id) in counts.keys():
+            await ctx.send(counts[ctx.channel.id]["current"] if len(str(counts[ctx.channel.id]["current"])) < 2000 else "Large")
         else:
             await ctx.send(":x:")
 
@@ -51,8 +52,8 @@ class Counting(commands.Cog):
         count = self.bot.ongoing_counts[ctx.guild.id][str(ctx.channel.id)]
         embed = discord.Embed(title=f"Count in {ctx.channel.name}", color=discord.Color.blurple(), timestamp=datetime.datetime.utcnow())
         embed.set_footer(text=ctx.author, icon_url=ctx.author.avatar_url)
-        embed.add_field(name="Current Number", value=str(count["current"]), inline=False)
-        embed.add_field(name="Highest Number", value=str(count["highest"]), inline=False)
+        embed.add_field(name="Current Number", value=str(count["current"]) if len(str(count["current"])) < 1024 else "Large", inline=False)
+        embed.add_field(name="Highest Number", value=str(count["highest"]) if len(str(count["highest"])) < 1024 else "Largefnc", inline=False)
         embed.set_thumbnail(url=ctx.guild.icon_url)
         if count["last_user"]:
             embed.add_field(name="Last Counter", value=self.bot.get_user(count["last_user"]).mention)
