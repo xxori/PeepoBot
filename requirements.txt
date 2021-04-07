@@ -1,4 +1,5 @@
 discord
 aiosqlite
 youtube_dl
-epicbox
+aiohttp
+beautifulsoup4

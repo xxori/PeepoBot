@@ -48,9 +48,9 @@ class Profiles(commands.Cog):
                 user = ctx.message.author
 
             user_info = await dbcontrol.get_user(user.id)
-            bio = user_info['bio']
-            image_url = user_info['image_url']
-            color = user_info['profile_color']
+            bio = user_info.get('bio')
+            image_url = user_info.get('image_url')
+            color = user_info.get('profile_color')
 
             embed = discord.Embed(
                 color=color if color else user.color,
